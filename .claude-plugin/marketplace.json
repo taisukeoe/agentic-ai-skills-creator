@@ -1,0 +1,23 @@
+{
+  "name": "agentic-skills-creator",
+  "owner": {
+    "name": "Softgraphy GK"
+  },
+  "metadata": {
+    "description": "Skills for creating and reviewing effective AI agent skills",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "skills-helper",
+      "description": "Skills for creating and reviewing effective AI agent skills following Claude's official best practices",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/creating-effective-skills",
+        "./skills/reviewing-skills",
+        "./skills/reviewing-plugin-marketplace"
+      ]
+    }
+  ]
+}
