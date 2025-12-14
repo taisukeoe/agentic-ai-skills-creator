@@ -52,6 +52,24 @@ Comprehensive review of agent skills against Claude's official best practices.
 - Getting feedback before publishing
 - Quality assurance for skill development
 
+### 3. reviewing-plugin-marketplace
+
+Review Claude Code plugin marketplace configurations against official best practices.
+
+**Features:**
+- marketplace.json structure validation
+- Skills paths verification
+- Git remote URL consistency checks
+- README.md repository reference validation
+- Common error detection (plugin.json presence, path mismatches)
+- Automated verification script
+
+**Use when:**
+- Creating a new plugin marketplace
+- Verifying marketplace configuration
+- Debugging plugin installation issues
+- Ensuring compliance with Anthropic format
+
 ## Installation
 
 ### From GitHub (Recommended)
@@ -90,7 +108,8 @@ To automatically enable this plugin in your project, add to `.claude/settings.js
   "permissions": {
     "allow": [
       "Skill(creating-effective-skills)",
-      "Skill(reviewing-skills)"
+      "Skill(reviewing-skills)",
+      "Skill(reviewing-plugin-marketplace)"
     ]
   }
 }
@@ -143,7 +162,7 @@ Claude will:
 ```
 agentic-ai-skills-creator/
 ├── .claude-plugin/
-│   └── plugin.json           # Plugin manifest
+│   └── marketplace.json      # Marketplace and plugin manifest
 ├── .claude/
 │   ├── settings.json         # Local development settings
 │   └── skills/              # Symlink to ../skills
@@ -177,7 +196,8 @@ Skills in `.claude/skills/` are automatically discovered. Configure permissions 
   "permissions": {
     "allow": [
       "Skill(creating-effective-skills)",
-      "Skill(reviewing-skills)"
+      "Skill(reviewing-skills)",
+      "Skill(reviewing-plugin-marketplace)"
     ]
   }
 }

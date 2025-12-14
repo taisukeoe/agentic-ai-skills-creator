@@ -99,6 +99,18 @@ Read and analyze:
 - Having both may cause confusion
 - If both exist, ensure names match
 
+**README.md consistency checks**:
+- **Skills documentation**: Verify all skills in marketplace.json are documented in README.md
+  - Check "Skills Included" section lists each skill from the `skills` array
+  - Each skill should have description and "Use when" guidance
+- **Project Structure accuracy**:
+  - If `plugin.json` mentioned in README but doesn't exist, suggest using `marketplace.json`
+  - Verify structure diagram matches actual files in `.claude-plugin/`
+- **Permissions section completeness**:
+  - Check if README.md settings.json examples include all skills from marketplace.json
+  - Example: `"Skill(skill-name)"` for each skill should be in permissions array
+- **Repository references**: Ensure consistent GitHub URLs across README installation examples
+
 ### Step 4: Compare with Anthropic Format
 
 See [references/anthropic-format.md](references/anthropic-format.md) for official structure.
