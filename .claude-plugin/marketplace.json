@@ -11,7 +11,7 @@
     {
       "name": "skills-helper",
       "description": "Skills for creating and reviewing effective AI agent skills following Claude's official best practices",
-      "source": "plugins/skills-helper",
+      "source": "./plugins/skills-helper",
       "strict": false
     }
   ]

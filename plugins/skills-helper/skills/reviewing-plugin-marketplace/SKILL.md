@@ -66,7 +66,7 @@ Read and analyze:
 
 **Each plugin must have**:
 - [ ] `name` - Plugin identifier
-- [ ] `source` - Source path (e.g., `"plugins/plugin-name"`)
+- [ ] `source` - Source path (must start with `./`, e.g., `"./plugins/plugin-name"`)
 - [ ] `description` - What the plugin does
 
 **Recommended fields**:
@@ -87,7 +87,7 @@ Read and analyze:
 
 **Source path validation**:
 - Verify `source` path exists
-- Recommended format: `"plugins/plugin-name"` (points to plugin directory)
+- Must start with `./` (e.g., `"./plugins/plugin-name"`)
 - Check that source directory contains `skills/` subdirectory with SKILL.md files
 
 **Skills path validation** (if `skills` array is used):
@@ -119,7 +119,7 @@ See [references/anthropic-format.md](references/anthropic-format.md) for officia
 **Key patterns from Anthropic**:
 - marketplace.json at `.claude-plugin/marketplace.json`
 - No plugin.json (marketplace.json only)
-- `source: "plugins/plugin-name"` pointing to plugin directory
+- `source: "./plugins/plugin-name"` pointing to plugin directory (must start with `./`)
 - `strict: false` (optional - only needed when plugin.json is missing)
 - Skills auto-discovered from `skills/` subdirectory (no explicit `skills` array needed)
 
