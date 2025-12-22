@@ -21,14 +21,26 @@ Claude Code plugin marketplace providing skills for creating and reviewing AI ag
 
 ## Architecture
 
+**Directory structure:**
+```
+plugins/skills-helper/     # Plugin root
+  skills/                  # Skills directory
+    creating-effective-skills/
+    reviewing-skills/
+    reviewing-plugin-marketplace/
+.claude/skills/            # Symlink → plugins/skills-helper/skills/
+.claude-plugin/marketplace.json
+```
+
 **Dual-purpose structure via symlink:**
-- `.claude/skills/` → symlink to `skills/`
+- `.claude/skills/` → symlink to `plugins/skills-helper/skills/`
 - Local dev: Skills auto-discovered from `.claude/skills/`
-- Distribution: Skills packaged from `skills/` via marketplace.json
+- Distribution: Skills packaged from `plugins/skills-helper/` via marketplace.json
 
 **Plugin marketplace pattern (Anthropic format):**
 - `.claude-plugin/marketplace.json` defines the plugin
-- `source: "./"` points to repository root
+- `source: "plugins/skills-helper"` points to plugin directory
+- Skills auto-discovered from `skills/` subdirectory (no explicit `skills` array needed)
 - `strict: false` allows marketplace.json to serve as complete manifest
 - No separate plugin.json needed at root
 
@@ -36,7 +48,7 @@ Claude Code plugin marketplace providing skills for creating and reviewing AI ag
 
 **Review a marketplace configuration:**
 ```bash
-bash skills/reviewing-plugin-marketplace/scripts/verify-marketplace.sh [marketplace-dir]
+bash plugins/skills-helper/skills/reviewing-plugin-marketplace/scripts/verify-marketplace.sh [marketplace-dir]
 ```
 
 ## Critical Knowledge
