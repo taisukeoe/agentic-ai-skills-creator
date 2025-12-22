@@ -137,8 +137,7 @@ agentic-ai-skills-creator/
 ├── .claude-plugin/
 │   └── marketplace.json      # Marketplace and plugin manifest
 ├── .claude/
-│   ├── settings.json         # Local development settings
-│   └── skills/              # Symlink to ../plugins/skills-helper/skills
+│   └── settings.json         # Local development settings
 ├── plugins/
 │   └── skills-helper/       # Plugin root (source path in marketplace.json)
 │       └── skills/
@@ -156,16 +155,9 @@ agentic-ai-skills-creator/
 └── README.md
 ```
 
-### Symlink Structure
-
-The `.claude/skills/` is a symlink to `plugins/skills-helper/skills/`, allowing:
-- Local development with skills auto-detected by Claude Code
-- Plugin distribution with proper structure via marketplace.json
-- Easy testing and iteration
-
 ### Local Development Settings
 
-Skills in `.claude/skills/` are automatically discovered. Configure permissions in `.claude/settings.json`:
+Configure permissions in `.claude/settings.json` for local development:
 
 ```json
 {
