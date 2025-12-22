@@ -88,33 +88,6 @@ Review Claude Code plugin marketplace configurations against official best pract
 
 After installation, restart Claude Code to activate the skills.
 
-### Auto-Enable in Projects
-
-To automatically enable this plugin in your project, add to `.claude/settings.json`:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "agentic-skills-creator": {
-      "source": {
-        "source": "github",
-        "repo": "taisukeoe/agentic-ai-skills-creator"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "skills-helper@agentic-skills-creator": true
-  },
-  "permissions": {
-    "allow": [
-      "Skill(creating-effective-skills)",
-      "Skill(reviewing-skills)",
-      "Skill(reviewing-plugin-marketplace)"
-    ]
-  }
-}
-```
-
 **How it works:**
 1. When team members open the project and trust the folder, the marketplace is automatically discovered
 2. The plugin is automatically enabled from the marketplace
