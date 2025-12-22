@@ -73,7 +73,7 @@ Read and analyze:
 - [ ] `metadata.description` - Marketplace description
 - [ ] `metadata.version` - Version number
 
-**Note**: `skills` array is optional - skills are auto-discovered from `skills/` subdirectory under source path
+**Note**: `skills` field specifies skills directory path (root-relative, e.g., `"./plugins/plugin-name/skills/"`)
 
 **Optional fields** (context-dependent):
 - [ ] `strict: false` - Only needed if plugins lack plugin.json files (see references/common-errors.md)
@@ -90,10 +90,9 @@ Read and analyze:
 - Must start with `./` (e.g., `"./plugins/plugin-name"`)
 - Check that source directory contains `skills/` subdirectory with SKILL.md files
 
-**Skills path validation** (if `skills` array is used):
-- Verify each path exists under source directory
-- Paths should point to directories with SKILL.md
-- Note: `skills` array is optional - auto-discovery from `skills/` subdirectory is preferred
+**Skills path validation**:
+- Verify `skills` path exists (root-relative, e.g., `"./plugins/plugin-name/skills/"`)
+- Directory should contain subdirectories with SKILL.md files
 
 **plugin.json conflicts**:
 - Anthropic's official format uses marketplace.json only
@@ -121,7 +120,7 @@ See [references/anthropic-format.md](references/anthropic-format.md) for officia
 - No plugin.json (marketplace.json only)
 - `source: "./plugins/plugin-name"` pointing to plugin directory (must start with `./`)
 - `strict: false` (optional - only needed when plugin.json is missing)
-- Skills auto-discovered from `skills/` subdirectory (no explicit `skills` array needed)
+- `skills` field specifies skills directory (root-relative path)
 
 ### Step 5: Generate Feedback
 

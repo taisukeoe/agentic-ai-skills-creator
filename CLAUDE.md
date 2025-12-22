@@ -40,7 +40,7 @@ plugins/skills-helper/     # Plugin root
 **Plugin marketplace pattern (Anthropic format):**
 - `.claude-plugin/marketplace.json` defines the plugin
 - `source: "./plugins/skills-helper"` points to plugin directory (must start with `./`)
-- Skills auto-discovered from `skills/` subdirectory (no explicit `skills` array needed)
+- `skills: "./plugins/skills-helper/skills/"` specifies skills directory (root-relative path)
 - `strict: false` allows marketplace.json to serve as complete manifest
 - No separate plugin.json needed at root
 
