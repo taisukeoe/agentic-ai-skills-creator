@@ -76,7 +76,7 @@ Review Claude Code plugin marketplace configurations against official best pract
 
 ```bash
 /plugin marketplace add taisukeoe/agentic-ai-skills-creator
-/plugin install skills-helper@taisukeoe/agentic-ai-skills-creator
+/plugin install skills-helper@agentic-ai-skills-creator
 ```
 
 ### From Local Path (Development)
