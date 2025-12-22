@@ -66,13 +66,14 @@ Read and analyze:
 
 **Each plugin must have**:
 - [ ] `name` - Plugin identifier
-- [ ] `source` - Source path (usually `"./"`)
+- [ ] `source` - Source path (e.g., `"plugins/plugin-name"`)
 - [ ] `description` - What the plugin does
 
 **Recommended fields**:
 - [ ] `metadata.description` - Marketplace description
 - [ ] `metadata.version` - Version number
-- [ ] `skills` - Array of skill paths (if applicable)
+
+**Note**: `skills` array is optional - skills are auto-discovered from `skills/` subdirectory under source path
 
 **Optional fields** (context-dependent):
 - [ ] `strict: false` - Only needed if plugins lack plugin.json files (see references/common-errors.md)
@@ -86,13 +87,13 @@ Read and analyze:
 
 **Source path validation**:
 - Verify `source` path exists
-- For Anthropic format: Always `"./"` (points to repository root)
-- Check that source directory contains expected files (skills/ directory)
+- Recommended format: `"plugins/plugin-name"` (points to plugin directory)
+- Check that source directory contains `skills/` subdirectory with SKILL.md files
 
-**Skills path validation**:
-- If `skills` array exists, verify each path
+**Skills path validation** (if `skills` array is used):
+- Verify each path exists under source directory
 - Paths should point to directories with SKILL.md
-- Common format: `"./skills/skill-name"`
+- Note: `skills` array is optional - auto-discovery from `skills/` subdirectory is preferred
 
 **plugin.json conflicts**:
 - Anthropic's official format uses marketplace.json only
@@ -118,9 +119,9 @@ See [references/anthropic-format.md](references/anthropic-format.md) for officia
 **Key patterns from Anthropic**:
 - marketplace.json at `.claude-plugin/marketplace.json`
 - No plugin.json (marketplace.json only)
-- `source: "./"` pointing to repository root
+- `source: "plugins/plugin-name"` pointing to plugin directory
 - `strict: false` (optional - only needed when plugin.json is missing)
-- `skills` array explicitly listing skill paths
+- Skills auto-discovered from `skills/` subdirectory (no explicit `skills` array needed)
 
 ### Step 5: Generate Feedback
 
