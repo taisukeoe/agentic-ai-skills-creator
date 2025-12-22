@@ -53,13 +53,18 @@ Identify what to include:
 
 ```
 skill-name/
-├── SKILL.md (required)
+├── SKILL.md (required - AI agent instructions)
+├── README.md (optional - human-facing installation and usage guide)
 ├── references/ (optional)
 ├── scripts/ (optional)
 └── assets/ (optional)
 ```
 
-**Do NOT create**: README.md, INSTALLATION_GUIDE.md, CHANGELOG.md, or auxiliary docs.
+**README.md vs SKILL.md**:
+- **SKILL.md**: Instructions for Claude (workflows, patterns, technical details)
+- **README.md**: Instructions for humans (installation, permissions, overview)
+
+**Avoid creating**: INSTALLATION_GUIDE.md, CHANGELOG.md, or other redundant docs. Use README.md for human-facing documentation.
 
 ### Step 5: Write SKILL.md
 
@@ -86,9 +91,8 @@ Be specific and include key terms. Description is the primary triggering mechani
 
 Use imperative form. Keep under 500 lines. Include:
 - Quick start / basic usage
-- Core workflows
+- Core workflows (for complex multi-step processes, see [references/workflows-and-validation.md](references/workflows-and-validation.md))
 - References to additional files
-- Settings.json Permissions section (at the end)
 
 Example pattern:
 ```markdown
@@ -98,21 +102,6 @@ Example pattern:
 ## Advanced features
 **Feature A**: See [references/feature-a.md](references/feature-a.md)
 **Feature B**: See [references/feature-b.md](references/feature-b.md)
-
-## Settings.json Permissions
-
-To enable this skill, add to `.claude/settings.json`:
-
-\`\`\`json
-{
-  "permissions": {
-    "allow": [
-      "Skill(skill-name)",
-      "Bash(scripts/your-script.sh:*)"
-    ]
-  }
-}
-\`\`\`
 ```
 
 Keep references one level deep. See [references/progressive-disclosure.md](references/progressive-disclosure.md) for patterns.
@@ -197,6 +186,31 @@ If skill uses **web data or other tools**:
 - Specify exact domains for WebFetch
 - Use path patterns for Read/Edit (e.g., `data/**`, `*.json`)
 
+**Document permissions in README.md**:
+
+Create a README.md with installation instructions for users:
+
+```markdown
+## Installation
+
+### Required Permissions
+
+To enable this skill, add to `.claude/settings.json`:
+
+\`\`\`json
+{
+  "permissions": {
+    "allow": [
+      "Skill(skill-name)",
+      "Bash(scripts/validate.py)"
+    ]
+  }
+}
+\`\`\`
+```
+
+README.md is for human users; SKILL.md is for Claude.
+
 ### Step 8: Test and Iterate
 
 1. Use skill on real tasks
@@ -220,18 +234,4 @@ If skill uses **web data or other tools**:
 
 **Degrees of Freedom**: [references/degrees-of-freedom.md](references/degrees-of-freedom.md) - Guidance on appropriate freedom levels
 
-## Settings.json Permissions
-
-To enable this skill, add to `.claude/settings.json`:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(creating-effective-skills)"
-    ]
-  }
-}
-```
-
-This skill provides guidance and doesn't require additional Bash permissions. However, if your created skills use scripts, add their specific permissions following the examples in Step 7.
+**Workflows and Validation**: [references/workflows-and-validation.md](references/workflows-and-validation.md) - Creating workflows with validation, feedback loops, and verifiable intermediate outputs

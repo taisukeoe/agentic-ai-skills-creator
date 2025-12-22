@@ -12,6 +12,7 @@ Detailed criteria for reviewing agent skills against best practices.
 - File Organization
 - Reference Files
 - Content Quality
+- Workflows and Validation
 - Anti-Patterns
 
 ## YAML Frontmatter
@@ -101,7 +102,6 @@ description: I can help you process PDF files
 - [ ] Quick start / basic usage
 - [ ] Core workflows
 - [ ] References to additional files (if any)
-- [ ] Settings.json Permissions section (at the end)
 
 **Writing style**:
 - [ ] Uses imperative form ("Run this", "Check that")
@@ -171,14 +171,20 @@ description: I can help you process PDF files
 - [ ] Not loaded into context
 - [ ] Properly referenced
 
-### Should NOT Exist
+### Optional Human-Facing Documentation
 
-- [ ] No README.md
-- [ ] No INSTALLATION_GUIDE.md
+**README.md** (optional but recommended):
+- [ ] If exists, contains installation instructions for humans
+- [ ] Includes Settings.json Permissions configuration
+- [ ] Provides overview and usage guidance
+- [ ] Clearly separated from SKILL.md (which is AI-facing)
+
+**Should NOT Exist**:
+- [ ] No INSTALLATION_GUIDE.md (use README.md instead)
 - [ ] No CHANGELOG.md
-- [ ] No other auxiliary documentation
+- [ ] No redundant documentation
 
-**Why**: Skills should only contain what an AI agent needs. Auxiliary docs add clutter without value.
+**Principle**: SKILL.md is for Claude; README.md is for humans. Avoid duplication.
 
 ## Reference Files
 
@@ -410,6 +416,146 @@ You can use pypdf, or pdfplumber, or PyMuPDF, or pdf2image, or camelot, or...
 
 **Good**: `database-schemas.md`, `api-authentication.md`
 **Bad**: `file1.md`, `other.md`
+
+## Workflows and Validation
+
+### Workflow Design
+
+**Multi-step workflows**:
+- [ ] Complex processes broken into clear sequential steps
+- [ ] Each step is actionable and specific
+- [ ] Decision points clearly indicated
+
+**Workflow checklists**:
+- [ ] Complex workflows (>3 steps) include copy-paste checklist
+- [ ] Checklist items match workflow steps
+- [ ] Makes progress tracking easy
+
+**Example** (good workflow with checklist):
+````markdown
+Copy this checklist:
+```
+- [ ] Step 1: Analyze form
+- [ ] Step 2: Create plan
+- [ ] Step 3: Validate plan
+- [ ] Step 4: Execute
+```
+
+**Step 1: Analyze form**
+Run: `python scripts/analyze.py input.pdf`
+````
+
+### Validation Patterns
+
+Check if skill implements validation appropriately for its task type:
+
+**Plan-Validate-Execute pattern**:
+- [ ] Used for batch operations or destructive changes (if applicable)
+- [ ] Creates intermediate plan file (JSON/YAML/CSV)
+- [ ] Validates plan before execution
+- [ ] Clear workflow: analyze → create plan → validate → execute → verify
+
+**Validate script pattern**:
+- [ ] Used for structured data editing (if applicable)
+- [ ] Validates after each significant change
+- [ ] Clear instructions to not proceed if validation fails
+- [ ] Validation runs before final output
+
+**Feedback loop pattern**:
+- [ ] Used for iterative quality improvement (if applicable)
+- [ ] Clear loop: execute → validate → fix → repeat
+- [ ] Exit criteria specified (when to stop iterating)
+
+**When validation should be used**:
+- Batch operations (>10 items)
+- Destructive changes (deletes, overwrites)
+- Structured data editing (XML, JSON, config files)
+- Format compliance requirements
+- High error cost operations
+
+**Red flags** (missing validation when it should exist):
+- Batch operations without plan file
+- XML/JSON editing without validation step
+- Database migrations without verification
+- Complex workflows with no validation steps
+
+### Validation Scripts
+
+**If scripts/ directory exists**:
+- [ ] Validation scripts named clearly (e.g., `validate.py`, `verify_output.py`)
+- [ ] Scripts referenced in workflow at appropriate points
+- [ ] Script usage explained with exact commands
+
+**Script quality**:
+- [ ] Error messages are specific and actionable
+- [ ] Shows what's wrong and how to fix it
+- [ ] Lists available options when field/value not found
+
+**Good validation script output**:
+```
+VALIDATION FAILED:
+  - Field 'signature_date' not found. Available fields: customer_name, order_total, signature_date_signed
+  - Line 15: order_total must be numeric, got 'invalid'
+```
+
+**Bad validation script output**:
+```
+Error: validation failed
+```
+
+**Script permissions**:
+- [ ] Validation scripts listed in Settings.json Permissions section
+- [ ] Correct format: `"Bash(python scripts/validate.py)"`
+
+### Workflow Recovery
+
+**Error handling**:
+- [ ] Workflows explain what to do if validation fails
+- [ ] Clear recovery steps provided
+- [ ] Reference to troubleshooting guide (if complex)
+
+**Example** (good recovery):
+```markdown
+If validation fails:
+1. Read the error message carefully - it shows the exact problem
+2. Edit the plan file to fix the issue
+3. Run validation again
+4. Repeat until validation passes
+5. Only then proceed to next step
+```
+
+**Bad recovery**:
+```markdown
+If validation fails, fix it and try again.
+```
+
+### Validation Appropriateness
+
+**Check if validation level matches task risk**:
+
+**High-risk tasks** (should have validation):
+- Database operations
+- Batch file updates
+- Production deployments
+- Data migrations
+- Document structure editing (OOXML, etc.)
+
+**Medium-risk tasks** (consider validation):
+- Report generation
+- Code generation
+- API integrations
+- Configuration changes
+
+**Low-risk tasks** (validation optional):
+- Simple data queries
+- Read-only operations
+- Single file edits
+- Exploratory analysis
+
+**Red flags**:
+- High-risk task with no validation
+- Trivial task with complex validation (over-engineering)
+- Validation exists but workflow doesn't enforce it
 
 ## Degrees of Freedom
 

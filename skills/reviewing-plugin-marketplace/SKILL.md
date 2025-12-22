@@ -191,24 +191,3 @@ Structure review with these sections:
 **Anthropic Format**: See [references/anthropic-format.md](references/anthropic-format.md) for official marketplace.json structure
 
 **Common Errors**: See [references/common-errors.md](references/common-errors.md) for detailed error patterns and solutions
-
-## Settings.json Permissions
-
-To enable automatic execution of this skill's commands, add to `.claude/settings.json`:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(reviewing-plugin-marketplace)",
-      "Bash(skills/reviewing-plugin-marketplace/scripts/verify-marketplace.sh:*)",
-      "Bash(cat .claude-plugin/marketplace.json)",
-      "Bash(git remote -v)",
-      "Bash(grep:*)",
-      "Bash(ls:*)"
-    ]
-  }
-}
-```
-
-**Note**: Adjust the script path if your skill is in a different location.

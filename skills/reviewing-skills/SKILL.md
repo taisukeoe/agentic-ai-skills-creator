@@ -89,12 +89,17 @@ Read and analyze:
 - Concrete examples
 - Clear workflows
 
-**Settings.json Permissions Section**:
-- Should exist at end of SKILL.md
-- Provides copy-paste snippet for `.claude/settings.json`
-- Includes skill name: `"Skill(skill-name)"`
-- Includes any Bash commands or scripts used
-- Uses correct format: `"Bash(script-path:*)"` for scripts with args
+**Workflows and Validation** (see checklist.md for detailed criteria):
+- [ ] Complex workflows include checklists for progress tracking
+- [ ] Validation patterns used appropriately (plan-validate-execute, validate script, feedback loop)
+- [ ] Validation scripts have clear, actionable error messages
+- [ ] Workflows explain recovery steps when validation fails
+- [ ] Validation level matches task risk (high-risk tasks should have validation)
+
+**README.md** (optional but recommended):
+- [ ] If exists, includes installation instructions and Settings.json Permissions
+- [ ] Clearly human-facing (not duplicating SKILL.md content)
+- [ ] Provides overview and usage guidance
 
 ### Step 4: Generate Feedback
 
@@ -181,19 +186,3 @@ See [references/checklist.md](references/checklist.md) for detailed criteria and
 ## Reference
 
 **Detailed Checklist**: See [references/checklist.md](references/checklist.md) for comprehensive review criteria
-
-## Settings.json Permissions
-
-To enable this skill, add to `.claude/settings.json`:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(reviewing-skills)"
-    ]
-  }
-}
-```
-
-This skill primarily uses Read and Glob tools which don't require additional Bash permissions.
