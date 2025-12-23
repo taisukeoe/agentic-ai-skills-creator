@@ -3,15 +3,23 @@
   "owner": {
     "name": "Softgraphy GK"
   },
+  "license": "Apache-2.0",
   "metadata": {
     "description": "Skills for creating and reviewing effective AI agent skills",
-    "version": "1.0.0"
+    "author": "Softgraphy GK",
+    "version": "0.1.0"
   },
   "plugins": [
     {
       "name": "skills-helper",
       "description": "Skills for creating and reviewing effective AI agent skills following Claude's official best practices",
       "source": "./plugins/skills-helper",
+      "strict": false
+    },
+    {
+      "name": "marketplace-helper",
+      "description": "Skills for reviewing and validating Claude Code plugin marketplace configurations",
+      "source": "./plugins/marketplace-helper",
       "strict": false
     }
   ]

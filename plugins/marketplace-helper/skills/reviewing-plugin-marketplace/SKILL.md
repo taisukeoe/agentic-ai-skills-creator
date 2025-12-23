@@ -1,6 +1,10 @@
 ---
 name: reviewing-plugin-marketplace
 description: Review Claude Code plugin marketplace configurations against official best practices. Use when analyzing marketplace.json and plugin.json files for structural issues, common errors, path validation, and consistency with Anthropic's official format. Detects repository URL mismatches, incorrect source paths, and missing required fields.
+license: Apache-2.0
+metadata:
+  author: Softgraphy GK
+  version: "0.1.0"
 ---
 
 # Reviewing Plugin Marketplace Configurations

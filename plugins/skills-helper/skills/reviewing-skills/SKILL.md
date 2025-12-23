@@ -1,6 +1,10 @@
 ---
 name: reviewing-skills
 description: Review agent skills against Claude's official best practices. Use when analyzing existing skills for compliance with naming conventions, progressive disclosure, conciseness, description quality, and structural patterns. Provides detailed feedback and improvement suggestions.
+license: Apache-2.0
+metadata:
+  author: Softgraphy GK
+  version: "0.1.0"
 ---
 
 # Reviewing Skills

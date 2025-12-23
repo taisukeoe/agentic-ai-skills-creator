@@ -14,41 +14,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Claude Code plugin marketplace providing skills for creating and reviewing AI agent skills following Claude's official best practices.
 
-**Three skills included:**
-- `creating-effective-skills` - Guide for creating skills with 8-step workflow
-- `reviewing-skills` - Review skills against best practices with compliance checks
-- `reviewing-plugin-marketplace` - Review marketplace configurations, detect common errors
+**Two plugins included:**
+
+1. **skills-helper** - Skills for AI agent skill development
+   - `creating-effective-skills` - Guide for creating skills with 8-step workflow
+   - `reviewing-skills` - Review skills against best practices with compliance checks
+
+2. **marketplace-helper** - Skills for marketplace configuration
+   - `reviewing-plugin-marketplace` - Review marketplace configurations, detect common errors
 
 ## Architecture
 
 **Directory structure:**
 ```
-plugins/skills-helper/     # Plugin root
-  skills/                  # Skills directory
-    creating-effective-skills/
-    reviewing-skills/
-    reviewing-plugin-marketplace/
-.claude/skills/            # Symlink → plugins/skills-helper/skills/
+plugins/
+  skills-helper/           # Plugin for skill development
+    skills/
+      creating-effective-skills/
+      reviewing-skills/
+  marketplace-helper/      # Plugin for marketplace validation
+    skills/
+      reviewing-plugin-marketplace/
 .claude-plugin/marketplace.json
 ```
 
-**Dual-purpose structure via symlink:**
-- `.claude/skills/` → symlink to `plugins/skills-helper/skills/`
-- Local dev: Skills auto-discovered from `.claude/skills/`
-- Distribution: Skills packaged from `plugins/skills-helper/` via marketplace.json
-
 **Plugin marketplace pattern (Anthropic format):**
-- `.claude-plugin/marketplace.json` defines the plugin
-- `source: "./plugins/skills-helper"` points to plugin directory (must start with `./`)
-- `skills: "./plugins/skills-helper/skills/"` specifies skills directory (root-relative path)
+- `.claude-plugin/marketplace.json` defines the plugins
+- `source: "./plugins/<plugin-name>"` points to plugin directory (must start with `./`)
+- Each plugin has its own `.claude-plugin/plugin.json` with `skills` path
 - `strict: false` allows marketplace.json to serve as complete manifest
-- No separate plugin.json needed at root
 
 ## Key Commands
 
 **Review a marketplace configuration:**
 ```bash
-bash plugins/skills-helper/skills/reviewing-plugin-marketplace/scripts/verify-marketplace.sh [marketplace-dir]
+bash plugins/marketplace-helper/skills/reviewing-plugin-marketplace/scripts/verify-marketplace.sh [marketplace-dir]
 ```
 
 ## Critical Knowledge
