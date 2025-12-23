@@ -77,6 +77,7 @@ Review Claude Code plugin marketplace configurations against official best pract
 ```bash
 /plugin marketplace add taisukeoe/agentic-ai-skills-creator
 /plugin install skills-helper@agentic-ai-skills-creator
+/plugin install marketplace-helper@agentic-ai-skills-creator
 ```
 
 ### From Local Path (Development)
@@ -84,6 +85,7 @@ Review Claude Code plugin marketplace configurations against official best pract
 ```bash
 /plugin marketplace add /path/to/agentic-ai-skills-creator
 /plugin install skills-helper@local
+/plugin install marketplace-helper@local
 ```
 
 After installation, restart Claude Code to activate the skills.
@@ -135,18 +137,24 @@ Claude will:
 ```
 agentic-ai-skills-creator/
 ├── .claude-plugin/
-│   └── marketplace.json      # Marketplace and plugin manifest
+│   └── marketplace.json      # Marketplace manifest
 ├── .claude/
 │   └── settings.json         # Local development settings
 ├── plugins/
-│   └── skills-helper/       # Plugin root (source path in marketplace.json)
+│   ├── skills-helper/        # Plugin for skill development
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   │       ├── creating-effective-skills/
+│   │       │   ├── SKILL.md
+│   │       │   └── references/
+│   │       └── reviewing-skills/
+│   │           ├── SKILL.md
+│   │           └── references/
+│   └── marketplace-helper/   # Plugin for marketplace validation
+│       ├── .claude-plugin/
+│       │   └── plugin.json
 │       └── skills/
-│           ├── creating-effective-skills/
-│           │   ├── SKILL.md
-│           │   └── references/
-│           ├── reviewing-skills/
-│           │   ├── SKILL.md
-│           │   └── references/
 │           └── reviewing-plugin-marketplace/
 │               ├── SKILL.md
 │               ├── scripts/
