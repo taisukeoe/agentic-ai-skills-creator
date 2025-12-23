@@ -1,6 +1,10 @@
 ---
 name: creating-effective-skills
 description: Creating high-quality agent skills following Claude's official best practices. Use when designing, implementing, or improving agent skills, including naming conventions, progressive disclosure patterns, description writing, and appropriate freedom levels. Helps ensure skills are concise, well-structured, and optimized for context efficiency.
+license: Apache-2.0
+metadata:
+  author: Softgraphy GK
+  version: "0.1.0"
 ---
 
 # Creating Effective Skills
