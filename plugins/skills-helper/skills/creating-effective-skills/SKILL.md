@@ -20,7 +20,7 @@ Guide for creating agent skills that follow Claude's official best practices.
 2. SKILL.md body (<5k tokens) - when triggered
 3. Bundled resources - as needed
 
-Keep SKILL.md under 500 lines. Move detailed content to reference files.
+**Keep SKILL.md small**: Target ~200 lines, maximum 500 lines. Move detailed content to reference files aggressively.
 
 **Single Responsibility**: Each skill does one thing well.
 
@@ -93,10 +93,12 @@ Be specific and include key terms. Description is the primary triggering mechani
 
 #### Body
 
-Use imperative form. Keep under 500 lines. Include:
+Use imperative form. Keep small (target ~200 lines, max 500). Include only:
 - Quick start / basic usage
-- Core workflows (for complex multi-step processes, see [references/workflows-and-validation.md](references/workflows-and-validation.md))
+- Core workflows
 - References to additional files
+
+For complex multi-step processes, see [references/workflows-and-validation.md](references/workflows-and-validation.md).
 
 Example pattern:
 ```markdown
@@ -126,96 +128,7 @@ skill/
 
 Avoid: deeply nested references, duplicate information, generic file names.
 
-### Step 7: Configure Permissions in Settings
-
-Skills in `.claude/skills/` are automatically discovered. Configure permissions in `.claude/settings.json`:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(skill-name)"
-    ]
-  }
-}
-```
-
-If the file already exists, add to the array:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(existing-skill)",
-      "Skill(skill-name)"
-    ]
-  }
-}
-```
-
-**Include tool permissions for commands used by the skill**:
-
-If skill uses **specific scripts**:
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(skill-name)",
-      "Bash(scripts/verify-marketplace.sh)",
-      "Bash(python scripts/validate.py)",
-      "Bash(node scripts/process_data.js)"
-    ]
-  }
-}
-```
-
-If skill uses **web data or other tools**:
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(skill-name)",
-      "WebFetch(domain:api.example.com)",
-      "Read(data/**)",
-      "Edit(output/**)"
-    ]
-  }
-}
-```
-
-**Guidelines**:
-- Skills are auto-discovered from `.claude/skills/`
-- Only list scripts explicitly referenced in SKILL.md or references
-- Use exact commands (e.g., `python scripts/validate.py`), not wildcards like `scripts/*`
-- Specify exact domains for WebFetch
-- Use path patterns for Read/Edit (e.g., `data/**`, `*.json`)
-
-**Document permissions in README.md**:
-
-Create a README.md with installation instructions for users:
-
-```markdown
-## Installation
-
-### Required Permissions
-
-To enable this skill, add to `.claude/settings.json`:
-
-\`\`\`json
-{
-  "permissions": {
-    "allow": [
-      "Skill(skill-name)",
-      "Bash(scripts/validate.py)"
-    ]
-  }
-}
-\`\`\`
-```
-
-README.md is for human users; SKILL.md is for Claude.
-
-### Step 8: Test and Iterate
+### Step 7: Test and Iterate
 
 1. Use skill on real tasks
 2. Notice where Claude struggles/succeeds
@@ -238,4 +151,4 @@ README.md is for human users; SKILL.md is for Claude.
 
 **Degrees of Freedom**: [references/degrees-of-freedom.md](references/degrees-of-freedom.md) - Guidance on appropriate freedom levels
 
-**Workflows and Validation**: [references/workflows-and-validation.md](references/workflows-and-validation.md) - Creating workflows with validation, feedback loops, and verifiable intermediate outputs
+**Workflows and Validation**: [references/workflows-and-validation.md](references/workflows-and-validation.md) - Creating workflows with validation and feedback loops
