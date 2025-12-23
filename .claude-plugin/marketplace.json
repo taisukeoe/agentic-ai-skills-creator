@@ -13,6 +13,12 @@
       "description": "Skills for creating and reviewing effective AI agent skills following Claude's official best practices",
       "source": "./plugins/skills-helper",
       "strict": false
+    },
+    {
+      "name": "marketplace-helper",
+      "description": "Skills for reviewing and validating Claude Code plugin marketplace configurations",
+      "source": "./plugins/marketplace-helper",
+      "strict": false
     }
   ]
 }

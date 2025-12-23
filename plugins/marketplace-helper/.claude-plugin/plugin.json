@@ -1,0 +1,5 @@
+{
+  "name": "marketplace-helper",
+  "description": "Skills for reviewing and validating Claude Code plugin marketplace configurations",
+  "skills": "./skills/"
+}
