@@ -90,14 +90,6 @@ Review Claude Code plugin marketplace configurations against official best pract
 
 After installation, restart Claude Code to activate the skills.
 
-**How it works:**
-1. When team members open the project and trust the folder, the marketplace is automatically discovered
-2. The plugin is automatically enabled from the marketplace
-3. Skills are pre-approved and ready to use
-4. Everyone on the team gets the same configuration
-
-This is the recommended approach for team projects to ensure consistent skill availability.
-
 ## Usage
 
 ### Creating a New Skill
