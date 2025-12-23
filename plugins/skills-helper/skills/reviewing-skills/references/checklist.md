@@ -82,9 +82,8 @@ description: I can help you process PDF files
 ### Size
 
 **Target**:
-- [ ] Under 500 lines
-- [ ] Ideally 200-400 lines
-- [ ] If >500: justified or needs refactoring
+- [ ] Target ~200 lines, maximum 500 lines
+- [ ] If >500: needs refactoring
 
 **When >500 is acceptable**:
 - Complex domain with many essential workflows

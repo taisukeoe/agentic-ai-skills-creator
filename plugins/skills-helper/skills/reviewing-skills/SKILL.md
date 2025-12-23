@@ -72,8 +72,8 @@ Read and analyze:
 
 **File Organization**:
 - Required: SKILL.md
-- Optional but recommended: references/, scripts/, assets/
-- Should NOT exist: README.md, CHANGELOG.md, INSTALLATION_GUIDE.md
+- Optional: README.md (human-facing), references/, scripts/, assets/
+- Should NOT exist: CHANGELOG.md, INSTALLATION_GUIDE.md
 
 **Reference Depth**:
 - References should be one level deep from SKILL.md
@@ -151,16 +151,6 @@ Format:
 [Same format]
 ```
 
-## Common Anti-Patterns to Flag
-
-❌ **Windows-style paths**: `scripts\file.py` → should be `scripts/file.py`
-❌ **Too many options**: Presenting 5+ alternatives without a default
-❌ **Time-sensitive info**: "Before August 2025, use..." → use "Old patterns" section
-❌ **Inconsistent terminology**: Mixing "API endpoint", "URL", "route", "path"
-❌ **Deeply nested references**: More than one level from SKILL.md
-❌ **Vague instructions**: "Process the data" → needs specific steps
-❌ **Auxiliary docs**: README.md, CHANGELOG.md shouldn't exist
-
 ## Output Format
 
 Structure review with these sections:
@@ -171,22 +161,4 @@ Structure review with these sections:
 - **Suggestions**: Nice to have (with improvements)
 - **Next Steps**: Prioritized actions
 
-See [references/checklist.md](references/checklist.md) for detailed criteria and full template example.
-
-## Tips for Effective Reviews
-
-**Be Constructive**: Always explain why something matters and how to fix it
-
-**Prioritize**: Focus on critical issues first, then important, then nice-to-haves
-
-**Be Specific**: "Description is vague" → "Description should include when to use the skill. Add: 'Use when...'"
-
-**Provide Examples**: Show good and bad examples when explaining issues
-
-**Consider Context**: Some "violations" may be justified for specific use cases
-
-**Check References**: Don't just review SKILL.md - check if referenced files exist and are appropriate
-
-## Reference
-
-**Detailed Checklist**: See [references/checklist.md](references/checklist.md) for comprehensive review criteria
+See [references/checklist.md](references/checklist.md) for detailed criteria.
