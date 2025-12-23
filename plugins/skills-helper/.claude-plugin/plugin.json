@@ -1,5 +1,6 @@
 {
   "name": "skills-helper",
   "description": "Skills for creating and reviewing effective AI agent skills following Claude's official best practices",
+  "version": "0.1.0",
   "skills": "./skills/"
 }
