@@ -4,7 +4,7 @@ description: Creating high-quality agent skills following Claude's official best
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Creating Effective Skills
@@ -128,13 +128,30 @@ skill/
 
 Avoid: deeply nested references, duplicate information, generic file names.
 
-### Step 7: Test and Iterate
+### Step 7: Define allowed-tools
 
-1. Use skill on real tasks
-2. Notice where Claude struggles/succeeds
-3. Identify improvements
-4. Update SKILL.md or resources
-5. Test again
+After completing SKILL.md and references, identify which tools the skill uses:
+
+1. Review SKILL.md and reference files for tool usage
+2. List tools that need pre-approval (e.g., `Bash(git status:*)`, `WebSearch`, `Skill(other-skill)`)
+3. Add `allowed-tools` field to frontmatter if needed
+
+```yaml
+---
+name: skill-name
+description: ...
+allowed-tools: "Bash(git status:*) Bash(git diff:*) WebSearch"
+---
+```
+
+This field is experimental but helps agents pre-approve tool access.
+
+**Important considerations**:
+- `Read`, `Glob` are already allowed by default - do not include
+- `Edit`, `Write` are destructive - do not pre-approve
+- Be as specific as possible with Bash subcommands
+  - Good: `Bash(git status:*) Bash(git diff:*) Bash(git log:*)`
+  - Avoid: `Bash(git:*)` (too broad, includes destructive operations like `git push --force`)
 
 ## Anti-Patterns
 

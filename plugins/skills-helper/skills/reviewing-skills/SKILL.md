@@ -4,7 +4,7 @@ description: Review agent skills against Claude's official best practices. Use w
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Reviewing Skills
@@ -67,6 +67,14 @@ Read and analyze:
 **Single Responsibility**:
 - Does skill focus on one clear purpose?
 - Or does it try to be a multi-purpose helper?
+
+**allowed-tools** (if present):
+- ✗ Too broad: `Bash(git:*)` (includes destructive operations)
+- ✓ Specific: `Bash(git status:*) Bash(git diff:*) Bash(git log:*)`
+- ✗ Unnecessary: `Read`, `Glob` (already allowed by default)
+- ✗ Dangerous: `Edit`, `Write`, `Bash(rm:*)` (destructive tools should not be pre-approved)
+- Check: Are only non-destructive commands allowed?
+- Check: Are subcommands specified explicitly?
 
 ### Step 3: Detailed Structure Review
 
