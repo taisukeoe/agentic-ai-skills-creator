@@ -71,6 +71,8 @@ Read and analyze:
 **allowed-tools** (if present):
 - ✗ Too broad: `Bash(git:*)` (includes destructive operations)
 - ✓ Specific: `Bash(git status:*) Bash(git diff:*) Bash(git log:*)`
+- ✗ Unnecessary: `Read`, `Glob` (already allowed by default)
+- ✗ Dangerous: `Edit`, `Write`, `Bash(rm:*)` (destructive tools should not be pre-approved)
 - Check: Are only non-destructive commands allowed?
 - Check: Are subcommands specified explicitly?
 

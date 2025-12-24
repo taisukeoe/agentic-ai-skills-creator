@@ -64,7 +64,7 @@ Format:
 ## Improvement Plan
 
 ### User-requested
-1. [Issue from hearing] → [Proposed fix]
+1. [Issue from feedback] → [Proposed fix]
 
 ### Technical
 1. [Issue from analysis] → [Proposed fix]
@@ -78,7 +78,6 @@ Execute the improvements:
 1. Edit SKILL.md
 2. Update/create reference files if needed
 3. Adjust scripts/assets if applicable
-4. If metadata contains `version`, bump it (e.g., 0.1.0 → 0.1.1)
 
 Show diff or summary of changes made.
 
