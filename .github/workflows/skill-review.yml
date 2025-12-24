@@ -1,0 +1,141 @@
+name: Skill Review on PR Ready
+
+on:
+  pull_request:
+    types: [ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  review-skills:
+    runs-on: ubuntu-slim
+    # Skip if PR is still a draft
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # ratchet:actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          # Get changed files between base and head
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Check if any SKILL.md files were changed
+          CHANGED_SKILLS=$(echo "$CHANGED_FILES" | grep "SKILL.md" || true)
+          echo "changed_skills<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_SKILLS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check version bumps
+        id: version-check
+        run: |
+          BASE_REF="origin/${{ github.event.pull_request.base.ref }}"
+          VERSION_REPORT=""
+
+          # Get list of changed SKILL.md files
+          CHANGED_SKILLS=$(git diff --name-only $BASE_REF...HEAD | grep "SKILL.md" || true)
+
+          if [ -n "$CHANGED_SKILLS" ]; then
+            while IFS= read -r skill_file; do
+              if [ -n "$skill_file" ]; then
+                # Get current version (from HEAD)
+                CURRENT_VERSION=$(grep -A1 "metadata:" "$skill_file" 2>/dev/null | grep "version:" | sed 's/.*version: *"\?\([^"]*\)"\?.*/\1/' || echo "unknown")
+
+                # Get base version (from base branch)
+                BASE_VERSION=$(git show "$BASE_REF:$skill_file" 2>/dev/null | grep -A1 "metadata:" | grep "version:" | sed 's/.*version: *"\?\([^"]*\)"\?.*/\1/' || echo "new file")
+
+                if [ "$CURRENT_VERSION" = "$BASE_VERSION" ] && [ "$BASE_VERSION" != "new file" ]; then
+                  VERSION_REPORT="${VERSION_REPORT}⚠ ${skill_file}: version NOT bumped (${BASE_VERSION} -> ${CURRENT_VERSION})\n"
+                else
+                  VERSION_REPORT="${VERSION_REPORT}✓ ${skill_file}: ${BASE_VERSION} -> ${CURRENT_VERSION}\n"
+                fi
+              fi
+            done <<< "$CHANGED_SKILLS"
+          else
+            VERSION_REPORT="No SKILL.md files were modified in this PR."
+          fi
+
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$VERSION_REPORT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Review skills with Claude
+        uses: anthropics/claude-code-action@7145c3e0510bcdbdd29f67cc4a8c1958f1acfa2f # ratchet:anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--model haiku"
+          prompt: |
+            You are reviewing skills in this repository for compliance with Claude Code best practices.
+
+            ## Your Tasks
+
+            ### 1. Review All Skills Against Best Practices
+
+            Review each skill in the `plugins/` directory against these best practices:
+
+            **Naming Conventions:**
+            - Use gerund form (e.g., `processing-pdfs`, `reviewing-skills`)
+            - Avoid generic names like `helper`, `utils`, `tools`
+            - No `anthropic-*` or `claude-*` prefixes
+            - Max 64 chars, lowercase/numbers/hyphens only
+
+            **Description Quality:**
+            - Third person, present tense
+            - Include WHAT it does AND WHEN to use it
+            - Front-load important keywords
+
+            **Structure:**
+            - SKILL.md under 500 lines
+            - Proper frontmatter with name, description, metadata
+            - Reference files only one level deep
+            - Settings.json permissions section at the end
+
+            **Progressive Disclosure:**
+            - Quick start at top
+            - Details in expandable sections or references
+            - Most important info first
+
+            ### 2. Focus on PR Changes
+
+            These files were changed in this PR:
+            ```
+            ${{ steps.changed-files.outputs.files }}
+            ```
+
+            Pay special attention to changes that affect skill quality or deviate from best practices.
+
+            ### 3. Version Bump Check
+
+            These SKILL.md files were modified:
+            ```
+            ${{ steps.changed-files.outputs.changed_skills }}
+            ```
+
+            Pre-computed version comparison results:
+            ```
+            ${{ steps.version-check.outputs.report }}
+            ```
+
+            If any skills show "version NOT bumped", flag this as an issue requiring attention.
+
+            ## Output Format
+
+            Provide a structured review with:
+
+            1. **Overall Compliance Summary** - Quick overview of all skills
+            2. **PR Change Analysis** - Issues found in changed files
+            3. **Version Bump Status** - Whether modified skills have version bumps
+            4. **Recommendations** - Prioritized list of improvements
+
+            Use ✓ for passing, ⚠ for warnings, ✗ for issues.
