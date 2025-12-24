@@ -34,7 +34,23 @@ Guide for creating high-quality agent skills that follow Claude's official best 
 - Improving existing skills
 - Learning skill development best practices
 
-### 2. reviewing-skills
+### 2. improving-skills
+
+Improve existing agent skills based on user feedback and best practices.
+
+**Features:**
+- User feedback gathering workflow
+- Technical analysis against best practices
+- Improvement plan presentation
+- Implementation with diff summary
+
+**Use when:**
+- Fixing issues in existing skills
+- Enhancing skill functionality
+- Refactoring skill structure
+- Addressing user-reported problems
+
+### 3. reviewing-skills
 
 Comprehensive review of agent skills against Claude's official best practices.
 
@@ -52,7 +68,7 @@ Comprehensive review of agent skills against Claude's official best practices.
 - Getting feedback before publishing
 - Quality assurance for skill development
 
-### 3. reviewing-plugin-marketplace
+### 4. reviewing-plugin-marketplace
 
 Review Claude Code plugin marketplace configurations against official best practices.
 
@@ -140,6 +156,8 @@ agentic-ai-skills-creator/
 │   │       ├── creating-effective-skills/
 │   │       │   ├── SKILL.md
 │   │       │   └── references/
+│   │       ├── improving-skills/
+│   │       │   └── SKILL.md
 │   │       └── reviewing-skills/
 │   │           ├── SKILL.md
 │   │           └── references/
@@ -164,6 +182,7 @@ Configure permissions in `.claude/settings.json` for local development:
   "permissions": {
     "allow": [
       "Skill(creating-effective-skills)",
+      "Skill(improving-skills)",
       "Skill(reviewing-skills)",
       "Skill(reviewing-plugin-marketplace)"
     ]

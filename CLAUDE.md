@@ -17,7 +17,8 @@ Claude Code plugin marketplace providing skills for creating and reviewing AI ag
 **Two plugins included:**
 
 1. **skills-helper** - Skills for AI agent skill development
-   - `creating-effective-skills` - Guide for creating skills with 8-step workflow
+   - `creating-effective-skills` - Guide for creating skills with 7-step workflow
+   - `improving-skills` - Improve existing skills based on user feedback
    - `reviewing-skills` - Review skills against best practices with compliance checks
 
 2. **marketplace-helper** - Skills for marketplace configuration
@@ -31,6 +32,7 @@ plugins/
   skills-helper/           # Plugin for skill development
     skills/
       creating-effective-skills/
+      improving-skills/
       reviewing-skills/
   marketplace-helper/      # Plugin for marketplace validation
     skills/
