@@ -174,7 +174,6 @@ description: I can help you process PDF files
 
 **README.md** (optional but recommended):
 - [ ] If exists, contains installation instructions for humans
-- [ ] Includes Settings.json Permissions configuration
 - [ ] Provides overview and usage guidance
 - [ ] Clearly separated from SKILL.md (which is AI-facing)
 
@@ -501,10 +500,6 @@ VALIDATION FAILED:
 ```
 Error: validation failed
 ```
-
-**Script permissions**:
-- [ ] Validation scripts listed in Settings.json Permissions section
-- [ ] Correct format: `"Bash(python scripts/validate.py)"`
 
 ### Workflow Recovery
 

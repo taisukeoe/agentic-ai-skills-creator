@@ -109,7 +109,7 @@ Read and analyze:
 - [ ] Validation level matches task risk (high-risk tasks should have validation)
 
 **README.md** (optional but recommended):
-- [ ] If exists, includes installation instructions and Settings.json Permissions
+- [ ] If exists, includes installation instructions
 - [ ] Clearly human-facing (not duplicating SKILL.md content)
 - [ ] Provides overview and usage guidance
 
@@ -134,7 +134,6 @@ Organize feedback by priority:
 - Could improve examples
 - Could reorganize for clarity
 - Could add reference files for long sections
-- Missing Settings.json Permissions section (add copy-paste snippet)
 
 ### Step 5: Provide Actionable Feedback
 

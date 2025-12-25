@@ -96,14 +96,3 @@ Quick check:
 | Provides feedback | Implements changes |
 | Read-only | Read-write |
 
-## Settings.json Permissions
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(improving-skills)"
-    ]
-  }
-}
-```

@@ -1,0 +1,6 @@
+{
+  "name": "skills-helper-experimental",
+  "description": "Experimental skills for AI agent skill development, including testing and iteration workflows",
+  "version": "0.1.0",
+  "skills": "./skills/"
+}
