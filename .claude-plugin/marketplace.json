@@ -7,7 +7,7 @@
   "metadata": {
     "description": "Skills for creating, reviewing, and improving effective AI agent skills",
     "author": "Softgraphy GK",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
@@ -20,6 +20,12 @@
       "name": "marketplace-helper",
       "description": "Skills for reviewing and validating Claude Code plugin marketplace configurations",
       "source": "./plugins/marketplace-helper",
+      "strict": false
+    },
+    {
+      "name": "skills-helper-experimental",
+      "description": "Experimental skills for AI agent skill development, including testing and iteration workflows",
+      "source": "./plugins/skills-helper-experimental",
       "strict": false
     }
   ]

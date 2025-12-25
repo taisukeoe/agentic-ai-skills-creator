@@ -67,11 +67,3 @@ bash plugins/marketplace-helper/skills/reviewing-plugin-marketplace/scripts/veri
 
 **Reference depth:** One level deep from SKILL.md only
 
-**Settings.json permissions format:**
-- Skills: `"Skill(skill-name)"`
-- Bash commands: `"Bash(command:*)"` for wildcards
-
-## When Editing Skills
-
-Each SKILL.md must include at the end:
-- "Settings.json Permissions" section with copy-paste snippet for users
