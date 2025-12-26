@@ -91,7 +91,7 @@ Collect all raw outputs and evaluate in parent session (consistent criteria):
 
 **After evaluation:**
 
-1. Determine recommended model (lowest tier with ✅ Full)
+1. Determine recommended model (least capable model with ✅ Full compatibility)
 2. Document in skill's description or metadata
 
 **REQUIRED:** Run `/improving-skills` when observations reveal issues.
