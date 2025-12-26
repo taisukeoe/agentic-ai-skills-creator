@@ -59,7 +59,11 @@ Run skill with each model, then evaluate results in parent session:
 
 **Phase 1: Execute (per model)**
 
-Spawn Task sub-agents for each model. Agent only **executes** and returns raw output:
+For each model to test (e.g., Claude 3.5 Haiku, Claude 3.5 Sonnet, Claude 3 Opus):
+
+1. In Claude Code CLI, spawn a new Task session
+2. Select the specific model from the model dropdown/selector
+3. Provide this prompt to the Task agent:
 
 ```
 Execute the skill at {skill_path} with this query:
@@ -72,6 +76,8 @@ Return:
 
 Do NOT evaluate pass/fail. Just report what happened.
 ```
+
+Agent only **executes** and returns raw output. Each model runs in its own isolated Task session.
 
 **Phase 2: Evaluate (parent session)**
 
