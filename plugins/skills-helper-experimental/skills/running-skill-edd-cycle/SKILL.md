@@ -2,10 +2,10 @@
 name: running-skill-edd-cycle
 description: Guides evaluation-driven development (EDD) process for agent skills. Use when setting up skill testing workflows, creating skill evaluation scenarios, or establishing Claude A/B feedback loops for skill validation. Provides development methodology, not content guidance.
 license: Apache-2.0
-allowed-tools: "Skill(creating-effective-skills) Skill(improving-skills)"
+allowed-tools: "Skill(creating-effective-skills) Skill(improving-skills) Skill(reviewing-skills)"
 metadata:
   author: Softgraphy GK
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Running Skill EDD Cycle
@@ -49,40 +49,87 @@ Create just enough content to address the gaps:
 - Add detail only when tests fail
 - Avoid over-explaining
 
-Use **creating-effective-skills** for content guidance (naming, description, structure).
+**REQUIRED:** Run `/creating-effective-skills` before writing any skill content. This ensures proper naming, description format, and structure from the start.
 
-### Step 4: Test with Multiple Models
+### Step 4: Evaluate with Multiple Models
 
-| Model | Focus |
-|-------|-------|
-| **Haiku** | Enough guidance? |
-| **Sonnet** | Clear and efficient? |
-| **Opus** | Avoid over-explaining? |
+> **Note:** This step requires Claude Code CLI. Skip this step if using Claude.ai (model selection not available).
 
-### Step 5: Iterate with Claude A/B Pattern
+Run skill with each model, then evaluate results in parent session:
 
-- **Claude A**: Designs and refines the skill
-- **Claude B**: Tests skill in real tasks (fresh instance with skill loaded)
+**Phase 1: Execute (per model)**
 
-**Observation checklist:**
+Spawn Task sub-agents for each model. Agent only **executes** and returns raw output:
 
-- [ ] Skill activates when expected?
-- [ ] Instructions clear?
-- [ ] Unexpected exploration paths?
-- [ ] Missed references?
-- [ ] Overreliance on sections?
-- [ ] Ignored content?
+```
+Execute the skill at {skill_path} with this query:
+{evaluation_query}
 
-Bring observations back to Claude A for improvements.
+Return:
+- Raw output/files generated
+- Actions taken (tools used, files read/written)
+- Any errors encountered
 
-Use **improving-skills** when observations reveal specific issues to fix.
+Do NOT evaluate pass/fail. Just report what happened.
+```
+
+**Phase 2: Evaluate (parent session)**
+
+Collect all raw outputs and evaluate in parent session (consistent criteria):
+
+1. Compare outputs against expected_behavior
+2. Rate each model's compatibility
+3. Note observations (activation timing, missed references, etc.)
+
+**Compatibility ratings:**
+
+| Rating | Meaning |
+|--------|---------|
+| ✅ Full | All evaluations pass |
+| ⚠️ Partial | Some pass, or requires workarounds |
+| ❌ None | Does not function correctly |
+
+**After evaluation:**
+
+1. Determine recommended model (least capable model with ✅ Full compatibility)
+2. Document in skill's description or metadata
+
+**REQUIRED:** Run `/improving-skills` when observations reveal issues.
+
+### Step 5: Final Review
+
+Before considering the skill complete:
+
+**REQUIRED:** Run `/reviewing-skills` to verify compliance with best practices.
+
+1. Address all compliance issues identified
+2. Re-run evaluations after fixes
+3. Repeat until skill passes review
+
+### Step 6: User Validation Guide
+
+After all reviews pass, output instructions for user to validate in a fresh session:
+
+```
+## Test Your Skill
+
+Run this command in a new terminal to test with a fresh Claude session:
+
+claude --model {recommended_model} "{evaluation_query}"
+
+After testing, paste the output file or result back to this session for final confirmation.
+```
+
+Replace:
+- `{recommended_model}`: Model determined in Step 4 (e.g., `sonnet`)
+- `{evaluation_query}`: A representative query from your evaluations
 
 ## Quick Reference
 
 ### Cycle
 
 ```
-Identify gaps -> Create evaluations -> Baseline -> Write minimal -> Iterate
+Identify gaps -> Create evaluations -> Baseline -> Write minimal -> Model eval (sub-agents) -> Review -> User validation
 ```
 
 ### What Observations Indicate
