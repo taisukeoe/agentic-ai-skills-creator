@@ -136,7 +136,7 @@ Each behavior is scored 0-100:
 
 **Weighted total:**
 ```
-Total = Σ(behavior_score × weight) / Σ(weight × 100) × 100
+Total = Σ(behavior_score × weight) / Σ(weights)
 ```
 
 ### Scoring Dimensions

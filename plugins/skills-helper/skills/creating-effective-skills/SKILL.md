@@ -47,7 +47,7 @@ Ask the user to clarify (adapt questions to context):
 
 Get clear sense of: purpose, usage examples, triggers, AND scope boundaries.
 
-### Step 1.5: Validate Scope
+### Step 2: Validate Scope
 
 Before proceeding, verify the skill follows **Single Responsibility**:
 
@@ -68,7 +68,7 @@ Before proceeding, verify the skill follows **Single Responsibility**:
 
 **Do NOT proceed to file creation until scope is validated.**
 
-### Step 2: Determine Freedom Level
+### Step 3: Determine Freedom Level
 
 Freedom level controls how much latitude Claude has when following the skill:
 
@@ -80,7 +80,7 @@ Freedom level controls how much latitude Claude has when following the skill:
 
 If uncertain after reading the reference, ask the user.
 
-### Step 3: Plan Reusable Contents
+### Step 4: Plan Reusable Contents
 
 Identify what to include:
 
@@ -88,7 +88,7 @@ Identify what to include:
 **References** (`references/`): Documentation loaded as needed
 **Assets** (`assets/`): Files used in output (templates, images, fonts)
 
-### Step 4: Create Structure
+### Step 5: Create Structure
 
 ```
 skill-name/
@@ -105,14 +105,14 @@ skill-name/
 - **SKILL.md**: Instructions for Claude (workflows, patterns, technical details)
 - **README.md**: Instructions for humans (installation, permissions, overview)
 
-**README.md must include**:
+**README.md, if present, should include**:
 - Overview of what the skill does
 - File structure explanation (especially `tests/scenarios.md` purpose)
 - Installation instructions and required permissions
 
 **Avoid creating**: INSTALLATION_GUIDE.md, CHANGELOG.md, or other redundant docs. Use README.md for human-facing documentation.
 
-### Step 5: Write SKILL.md
+### Step 6: Write SKILL.md
 
 #### Frontmatter
 
@@ -154,7 +154,7 @@ Example pattern:
 
 Keep references one level deep. See [references/progressive-disclosure.md](references/progressive-disclosure.md) for patterns.
 
-### Step 6: Create Reference Files
+### Step 7: Create Reference Files
 
 For files >100 lines, include table of contents at top.
 
@@ -169,7 +169,7 @@ skill/
 
 Avoid: deeply nested references, duplicate information, generic file names.
 
-### Step 7: Create Test Scenarios
+### Step 8: Create Test Scenarios
 
 Create `tests/scenarios.md` for self-evaluation with `/evaluating-skills-with-models`:
 
@@ -195,7 +195,7 @@ Create `tests/scenarios.md` for self-evaluation with `/evaluating-skills-with-mo
 
 **Why this format**: Binary pass/fail doesn't differentiate models. Quality-based scoring reveals capability differences.
 
-### Step 8: Define allowed-tools
+### Step 9: Define allowed-tools
 
 After completing SKILL.md and references, identify which tools the skill uses:
 

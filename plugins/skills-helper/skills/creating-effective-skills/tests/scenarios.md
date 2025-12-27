@@ -141,7 +141,7 @@
    - **Haiku pitfall:** Skips planning, jumps to writing
    - **Weight:** 3
 
-4. Follows Steps 4-7 (Structure through Tests)
+4. Follows Steps 5-8 (Structure through Tests)
    - **Minimum:** Creates basic structure
    - **Quality criteria:**
      - Creates proper directory structure

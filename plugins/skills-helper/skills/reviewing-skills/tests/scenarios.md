@@ -148,8 +148,8 @@
    - **Minimum:** Mentions test scenarios
    - **Quality criteria:**
      - Explicitly checks for this file
-     - Notes it's optional but recommended
-     - Explains when it's useful (complex skills)
+     - Notes it's important for quality and recommended for most skills
+     - Explains when it's useful (multi-model evaluation, complex skills)
    - **Haiku pitfall:** Doesn't check for scenarios reference
    - **Weight:** 2
 

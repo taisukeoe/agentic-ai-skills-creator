@@ -101,8 +101,8 @@ For each expected behavior, score 0-100:
 ### Step 4: Calculate Weighted Scores
 
 ```
-Behavior Score = base_score × (weight / max_weight)
-Total = Σ(behavior_scores) / Σ(weights) × 100
+Behavior Score = base_score  // after applying deductions (e.g., Haiku pitfalls)
+Total = Σ(behavior_score × weight) / Σ(weights)
 ```
 
 **Rating thresholds:**
