@@ -21,9 +21,9 @@
    - **Minimum:** States high/medium/low
    - **Quality criteria:**
      - References degrees-of-freedom.md
-     - Correctly identifies as HIGH freedom (formatting has many valid approaches)
-     - Explains why: low fragility, high context-dependency
-   - **Haiku pitfall:** Picks medium/low without justification, or misreads fragility
+     - Correctly identifies as MEDIUM or HIGH freedom (formatting has valid approaches but some patterns exist)
+     - Explains why: low fragility, medium-to-high context-dependency
+   - **Haiku pitfall:** Picks LOW without justification, or misreads fragility
    - **Weight:** 3
 
 3. Creates SKILL.md with proper naming

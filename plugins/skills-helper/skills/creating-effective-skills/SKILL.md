@@ -28,22 +28,57 @@ Guide for creating agent skills that follow Claude's official best practices.
 
 ### Step 1: Understand the Skill Need
 
-Ask the user:
-- "What functionality should this skill support?"
-- "Can you give examples of how this skill would be used?"
-- "What would trigger this skill?"
+Ask the user to clarify (adapt questions to context):
 
-Get clear sense of: purpose, usage examples, triggers.
+**For clear requests** (e.g., "format markdown tables"):
+- "What input formats should be supported?"
+- "What output preferences do you have?"
+- "What edge cases should be handled?"
+
+**For ambiguous requests** (e.g., "handle data", "help with files"):
+- "What KIND of data/files?" (format, source, structure)
+- "What OPERATIONS?" (transform, validate, migrate, analyze)
+- "What's the specific problem to solve?"
+- Ask at least 3 specific questions before proceeding
+
+**Red flags requiring extra clarification:**
+- Vague verbs: "handle", "process", "manage", "help with"
+- Broad nouns: "data", "files", "documents" without specifics
+
+Get clear sense of: purpose, usage examples, triggers, AND scope boundaries.
+
+### Step 1.5: Validate Scope
+
+Before proceeding, verify the skill follows **Single Responsibility**:
+
+**Check naming:**
+- ❌ `handling-data` - too broad, what data? what handling?
+- ❌ `data-helper` - generic, unclear purpose
+- ✅ `transforming-csv-data` - specific operation + data type
+- ✅ `validating-json-schemas` - clear single purpose
+
+**Check boundaries:**
+- Can you clearly state what's IN scope vs OUT of scope?
+- If boundaries are unclear, scope is too broad → ask user to narrow
+
+**If scope is too broad:**
+1. Propose a focused alternative (e.g., "handling data" → "transforming-csv-data")
+2. Explain what's excluded and why
+3. Suggest splitting into multiple skills if needed
+
+**Do NOT proceed to file creation until scope is validated.**
 
 ### Step 2: Determine Freedom Level
 
-Based on the skill's nature, determine appropriate degree of freedom:
+Freedom level controls how much latitude Claude has when following the skill:
 
-**High freedom** (text instructions): Multiple approaches valid, context-dependent decisions
-**Medium freedom** (templates + parameters): Preferred pattern exists, some variation acceptable
-**Low freedom** (exact scripts): Fragile operations, consistency critical
+- **High**: Multiple valid approaches, context-dependent decisions
+- **Medium**: Preferred pattern exists, some variation acceptable
+- **Low**: Fragile operations, consistency critical
 
-If uncertain, ask the user. See [references/degrees-of-freedom.md](references/degrees-of-freedom.md) for guidance.
+**Unless clearly LOW freedom**: Read [references/degrees-of-freedom.md](references/degrees-of-freedom.md) and apply the decision framework. Cite the factors (fragility, context-dependency, consistency, error impact) in your justification.
+
+If uncertain after reading the reference, ask the user.
 
 ### Step 3: Plan Reusable Contents
 
