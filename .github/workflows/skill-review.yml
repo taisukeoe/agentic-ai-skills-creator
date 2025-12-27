@@ -50,10 +50,11 @@ jobs:
             while IFS= read -r skill_file; do
               if [ -n "$skill_file" ]; then
                 # Get current version (from HEAD)
-                CURRENT_VERSION=$(grep -A1 "metadata:" "$skill_file" 2>/dev/null | grep "version:" | sed 's/.*version: *"\?\([^"]*\)"\?.*/\1/' || echo "unknown")
+                # Use -A5 to capture version field which may be several lines after metadata:
+                CURRENT_VERSION=$(grep -A5 "metadata:" "$skill_file" 2>/dev/null | grep "version:" | sed -E 's/.*version:[[:space:]]*"?([^"[:space:]]+)"?.*/\1/' || echo "unknown")
 
                 # Get base version (from base branch)
-                BASE_VERSION=$(git show "$BASE_REF:$skill_file" 2>/dev/null | grep -A1 "metadata:" | grep "version:" | sed 's/.*version: *"\?\([^"]*\)"\?.*/\1/' || echo "new file")
+                BASE_VERSION=$(git show "$BASE_REF:$skill_file" 2>/dev/null | grep -A5 "metadata:" | grep "version:" | sed -E 's/.*version:[[:space:]]*"?([^"[:space:]]+)"?.*/\1/' || echo "new file")
 
                 if [ "$CURRENT_VERSION" = "$BASE_VERSION" ] && [ "$BASE_VERSION" != "new file" ]; then
                   VERSION_REPORT="${VERSION_REPORT}⚠ ${skill_file}: version NOT bumped (${BASE_VERSION} -> ${CURRENT_VERSION})\n"
