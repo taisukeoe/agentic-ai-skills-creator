@@ -1,6 +1,6 @@
 ---
 name: reviewing-skills
-description: Review agent skills against Claude's official best practices. Use when analyzing existing skills for compliance with naming conventions, progressive disclosure, conciseness, description quality, and structural patterns. Provides detailed feedback and improvement suggestions.
+description: Check skill files for best practices compliance (naming, description, structure, size). Use when verifying a skill follows conventions, checking SKILL.md quality, or getting feedback before publishing. Static analysis only - reads files but does NOT execute the skill.
 license: Apache-2.0
 metadata:
   author: Softgraphy GK

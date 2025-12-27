@@ -2,6 +2,17 @@
 
 Reference for Claude Code plugin marketplace structure based on https://github.com/anthropics/skills
 
+## Table of Contents
+
+- Official Repository Structure
+- Official marketplace.json
+- Key Patterns
+- Your Template
+- User Installation
+- User Settings Configuration
+- Comparison: Single vs Multiple Plugins
+- References
+
 ## Official Repository Structure
 
 ```

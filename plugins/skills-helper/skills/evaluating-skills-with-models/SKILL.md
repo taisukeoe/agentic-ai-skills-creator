@@ -1,6 +1,6 @@
 ---
 name: evaluating-skills-with-models
-description: Evaluate agent skills across multiple Claude models (sonnet, opus, haiku) using sub-agents and compare results. Use when testing skill compatibility across models, determining recommended model for a skill, or comparing model performance on skill execution.
+description: Run skill tests across sonnet, opus, and haiku models using sub-agents. Use when testing if a skill actually works, comparing model performance, or finding the cheapest compatible model. Executes the skill with test scenarios and compares results.
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
