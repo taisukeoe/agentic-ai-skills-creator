@@ -27,8 +27,7 @@ RUN if getent group $USER_GID > /dev/null 2>&1; then \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Claude Code configuration directory (binary installed to ~/.local/bin)
-ENV CLAUDE_CONFIG_DIR=/opt/claude-config
+# Claude Code: binary at ~/.local/bin, config at ~/.claude (both defaults)
 ENV PATH="/home/vscode/.local/bin:$PATH"
 
 USER $USERNAME

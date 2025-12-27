@@ -64,11 +64,9 @@ Create `.devcontainer/devcontainer.json`:
     "dockerfile": "Dockerfile"
   },
   "mounts": [
-    "source=claude-config-${MARKETPLACE_NAME},target=/opt/claude-config,type=volume"
+    "source=claude-config-${MARKETPLACE_NAME},target=/home/vscode/.claude,type=volume",
+    "source=claude-data-${MARKETPLACE_NAME},target=/home/vscode/.local/share/claude,type=volume"
   ],
-  "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/opt/claude-config"
-  },
   "remoteUser": "vscode",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": "bash .devcontainer/reinstall-marketplace.sh"
@@ -76,8 +74,10 @@ Create `.devcontainer/devcontainer.json`:
 ```
 
 **Key design decisions**:
-- Named volume `claude-config-${MARKETPLACE_NAME}` for credential persistence
-- `CLAUDE_CONFIG_DIR=/opt/claude-config` to separate binary from host config
+- Two named volumes for persistence:
+  - `claude-config-${MARKETPLACE_NAME}` → `~/.claude` (config, credentials, settings)
+  - `claude-data-${MARKETPLACE_NAME}` → `~/.local/share/claude` (binary)
+- `~/.claude.json` (setup state) is symlinked to `~/.claude/.home-claude.json` in post-create.sh
 - `postStartCommand` ensures marketplace sync on every container start
 
 ### Step 4: Generate Dockerfile
@@ -114,8 +114,7 @@ RUN if getent group $USER_GID > /dev/null 2>&1; then \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Claude Code configuration directory (binary installed to ~/.local/bin)
-ENV CLAUDE_CONFIG_DIR=/opt/claude-config
+# Claude Code: binary at ~/.local/bin, config at ~/.claude (both defaults)
 ENV PATH="/home/vscode/.local/bin:$PATH"
 
 USER $USERNAME
@@ -126,7 +125,7 @@ WORKDIR /workspaces
 - `zsh` as default shell for better UX
 - Handle existing UID/GID 1000 in ubuntu base image
 - Passwordless sudo for volume permission fixes
-- PATH includes `~/.local/bin` where Claude binary installs
+- PATH includes `~/.local/bin` where Claude binary is installed
 
 ### Step 5: Generate post-create.sh
 
@@ -136,20 +135,35 @@ Create `.devcontainer/post-create.sh`:
 #!/bin/bash
 set -e
 
-CONFIG_DIR="${CLAUDE_CONFIG_DIR:-/opt/claude-config}"
+CONFIG_DIR="$HOME/.claude"
 WORKSPACE="/workspaces/${PROJECT_DIR}"
 
-# Ensure Claude Code is in PATH (installed to ~/.local/bin by default)
+# Ensure Claude Code is in PATH
 export PATH="$HOME/.local/bin:$PATH"
 
 echo "Setting up Claude Code devcontainer..."
 
-# Ensure config directory has correct ownership (volume may be owned by root initially)
-if [ -d "$CONFIG_DIR" ]; then
-    sudo chown -R $(id -u):$(id -g) "$CONFIG_DIR"
-else
-    sudo mkdir -p "$CONFIG_DIR"
-    sudo chown -R $(id -u):$(id -g) "$CONFIG_DIR"
+# Ensure required directories have correct ownership (volumes may be owned by root initially)
+for dir in "$CONFIG_DIR" "$HOME/.local/share/claude" "$HOME/.local/state" "$HOME/.local/bin"; do
+    if [ -d "$dir" ]; then
+        sudo chown -R $(id -u):$(id -g) "$dir"
+    else
+        sudo mkdir -p "$dir"
+        sudo chown -R $(id -u):$(id -g) "$dir"
+    fi
+done
+
+# Symlink ~/.claude.json to persist setup state inside the volume
+# (Claude Code stores initial setup completion state in this file)
+CLAUDE_JSON_IN_VOLUME="$CONFIG_DIR/.home-claude.json"
+if [ -d "$HOME/.claude.json" ]; then
+    # Remove if it's a directory (from failed volume mount)
+    rm -rf "$HOME/.claude.json"
+fi
+if [ ! -L "$HOME/.claude.json" ]; then
+    # Create valid empty JSON if not exists
+    [ ! -f "$CLAUDE_JSON_IN_VOLUME" ] && echo '{}' > "$CLAUDE_JSON_IN_VOLUME"
+    ln -sf "$CLAUDE_JSON_IN_VOLUME" "$HOME/.claude.json"
 fi
 
 # Install Claude Code if not present
@@ -160,8 +174,9 @@ else
     echo "Claude Code already installed."
 fi
 
-# Generate settings.json with enabled plugins and permissions
+# Generate settings.json with enabled plugins and permissions (only if not exists)
 mkdir -p "$CONFIG_DIR"
+if [ ! -f "$CONFIG_DIR/settings.json" ]; then
 cat > "$CONFIG_DIR/settings.json" << 'SETTINGS_EOF'
 {
   "enabledPlugins": {
@@ -174,31 +189,47 @@ ${ALLOWED_SKILLS_JSON}
   }
 }
 SETTINGS_EOF
+  echo "Settings configured."
+else
+  echo "Settings already exist, skipping."
+fi
 
-# Register marketplace and install plugins
-claude plugin marketplace add "$WORKSPACE" || true
+# Register marketplace and install plugins (only if Claude is already set up)
+# Skip if not set up yet - user needs to run 'claude' first to complete setup
+if [ -s "$CLAUDE_JSON_IN_VOLUME" ] && [ "$(cat "$CLAUDE_JSON_IN_VOLUME")" != "{}" ]; then
+    echo "Registering marketplace..."
+    claude plugin marketplace add "$WORKSPACE" || true
+
+    echo "Installing plugins..."
 ${PLUGIN_INSTALL_COMMANDS}
+else
+    echo "Claude not yet set up. Run 'claude' to complete setup, then run:"
+    echo "  bash .devcontainer/reinstall-marketplace.sh"
+fi
 
 echo ""
 echo "======================================"
 echo "Claude Code devcontainer ready!"
 echo ""
-echo "Run 'claude login' to authenticate."
+echo "Run 'claude' to complete initial setup (first time only)."
 echo "Your credentials will persist across container rebuilds."
 echo "======================================"
 ```
 
 **Key implementation details**:
 - Export PATH with `~/.local/bin` for non-login shell scripts
-- Fix volume ownership with `sudo chown` before accessing
-- Use `command -v claude` to check installation (not file path)
-- Use `|| true` to continue if marketplace already registered
+- Fix ownership of all required directories (volumes may be root-owned initially)
+- Symlink `~/.claude.json` → `~/.claude/.home-claude.json` to persist setup state
+- Create valid empty JSON `{}` (not empty file) to avoid parse errors
+- Only write `settings.json` if not exists (preserve user modifications)
+- Only run plugin commands if Claude setup is complete (check `~/.claude.json` content)
+- Use `|| true` to continue if commands fail
 
 **Dynamic content to substitute**:
 - `${PROJECT_DIR}` - Project directory name
 - `${ENABLED_PLUGINS_JSON}` - Object entries like `"plugin@market": true`
 - `${ALLOWED_SKILLS_JSON}` - Array entries like `"Skill(name)"`
-- `${PLUGIN_INSTALL_COMMANDS}` - Plugin install commands
+- `${PLUGIN_INSTALL_COMMANDS}` - Plugin install commands (with `|| true`)
 
 ### Step 6: Generate reinstall-marketplace.sh
 
@@ -210,12 +241,12 @@ Create `.devcontainer/reinstall-marketplace.sh`:
 # Run manually or via postStartCommand
 # Usage: bash reinstall-marketplace.sh [--quiet]
 
-# Ensure Claude Code is in PATH (installed to ~/.local/bin by default)
+# Ensure Claude Code is in PATH
 export PATH="$HOME/.local/bin:$PATH"
 
 QUIET="${1:-}"
 SRC="/workspaces/${PROJECT_DIR}"
-CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+CONFIG_DIR="$HOME/.claude"
 
 reinstall_marketplace() {
   local src="$1"
@@ -295,24 +326,38 @@ To manually sync marketplace changes:
 
 ### Volume Strategy
 
-Uses `CLAUDE_CONFIG_DIR=/opt/claude-config` with named Docker volume:
+Uses two named Docker volumes plus a symlink for complete persistence:
 
 ```
-~/.local/bin/
-└── claude                   # Claude Code binary (NOT in volume)
-
-/opt/claude-config/          # Named volume (persistent)
+Volume 1: claude-config-${MARKETPLACE_NAME} → ~/.claude/
+├── .home-claude.json        # Setup state (symlink target)
+├── .credentials.json        # Auth tokens
 ├── settings.json            # User settings
-├── credentials.json         # Auth tokens
 └── plugins/                 # Plugin data
+
+Volume 2: claude-data-${MARKETPLACE_NAME} → ~/.local/share/claude/
+└── versions/
+    └── X.X.X                # Claude Code binary
+
+Symlink (created by post-create.sh):
+~/.claude.json → ~/.claude/.home-claude.json
 ```
 
-**Important**: The Claude binary is always installed to `~/.local/bin/claude`, not the config directory. `CLAUDE_CONFIG_DIR` only controls where configuration files are stored.
+**Why three persistence mechanisms?**
+
+| Location | Purpose | Persistence Method |
+|----------|---------|-------------------|
+| `~/.claude/` | Config, credentials, settings | Volume mount |
+| `~/.local/share/claude/` | Binary (216MB) | Volume mount |
+| `~/.claude.json` | Initial setup state | Symlink to volume |
+
+**Important**: `~/.claude.json` cannot be directly mounted as a volume (Docker creates a directory instead of a file). The symlink approach allows the file to persist inside the `~/.claude/` volume.
 
 Benefits:
-- Credentials persist across container rebuilds
+- All Claude state persists across container rebuilds
+- No re-login or re-setup required after rebuild
+- Binary cached in volume (faster rebuilds)
 - Configuration isolated from host
-- No host directory conflicts
 
 ### Plugin Format
 
@@ -347,6 +392,10 @@ Runs automatically on container start via `postStartCommand`.
 | GID/UID 1000 already exists | Ubuntu base image has existing user | Use `getent` to detect and rename existing user |
 | Permission denied on config | Volume owned by root | Use `sudo chown` in post-create.sh |
 | claude: command not found | PATH not set | Export `PATH="$HOME/.local/bin:$PATH"` in scripts |
+| EISDIR on ~/.claude.json | Volume mounted as directory | Remove directory, use symlink instead |
+| JSON Parse error: Unexpected EOF | Empty ~/.claude.json file | Initialize with `{}` not empty file |
+| Raw mode not supported | Plugin commands in non-interactive shell | Only run plugin commands if setup complete |
+| Login required after rebuild | ~/.claude.json not persisted | Symlink to file inside volume |
 
 ## References
 

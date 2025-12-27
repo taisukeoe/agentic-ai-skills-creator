@@ -5,7 +5,7 @@
 # Run manually or via postStartCommand
 # Usage: bash reinstall-marketplace.sh [--quiet]
 
-# Ensure Claude Code is in PATH (installed to ~/.local/bin by default)
+# Ensure Claude Code is in PATH
 export PATH="$HOME/.local/bin:$PATH"
 
 QUIET="${1:-}"

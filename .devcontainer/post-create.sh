@@ -3,20 +3,35 @@
 # Generated for: agentic-skills-creator
 set -e
 
-CONFIG_DIR="${CLAUDE_CONFIG_DIR:-/opt/claude-config}"
+CONFIG_DIR="$HOME/.claude"
 WORKSPACE="/workspaces/agentic-ai-skills-creator"
 
-# Ensure Claude Code is in PATH (installed to ~/.local/bin by default)
+# Ensure Claude Code is in PATH
 export PATH="$HOME/.local/bin:$PATH"
 
 echo "Setting up Claude Code devcontainer..."
 
-# Ensure config directory has correct ownership (volume may be owned by root initially)
-if [ -d "$CONFIG_DIR" ]; then
-    sudo chown -R $(id -u):$(id -g) "$CONFIG_DIR"
-else
-    sudo mkdir -p "$CONFIG_DIR"
-    sudo chown -R $(id -u):$(id -g) "$CONFIG_DIR"
+# Ensure required directories have correct ownership (volumes may be owned by root initially)
+for dir in "$CONFIG_DIR" "$HOME/.local/share/claude" "$HOME/.local/state" "$HOME/.local/bin"; do
+    if [ -d "$dir" ]; then
+        sudo chown -R $(id -u):$(id -g) "$dir"
+    else
+        sudo mkdir -p "$dir"
+        sudo chown -R $(id -u):$(id -g) "$dir"
+    fi
+done
+
+# Symlink ~/.claude.json to persist it inside the volume
+# (Claude Code stores setup state in this file)
+CLAUDE_JSON_IN_VOLUME="$CONFIG_DIR/.home-claude.json"
+if [ -d "$HOME/.claude.json" ]; then
+    # Remove if it's a directory (from failed volume mount)
+    rm -rf "$HOME/.claude.json"
+fi
+if [ ! -L "$HOME/.claude.json" ]; then
+    # Create valid empty JSON if not exists
+    [ ! -f "$CLAUDE_JSON_IN_VOLUME" ] && echo '{}' > "$CLAUDE_JSON_IN_VOLUME"
+    ln -sf "$CLAUDE_JSON_IN_VOLUME" "$HOME/.claude.json"
 fi
 
 # Install Claude Code if not present
@@ -27,8 +42,9 @@ else
     echo "Claude Code already installed."
 fi
 
-# Generate settings.json with enabled plugins and permissions
+# Generate settings.json with enabled plugins and permissions (only if not exists)
 mkdir -p "$CONFIG_DIR"
+if [ ! -f "$CONFIG_DIR/settings.json" ]; then
 cat > "$CONFIG_DIR/settings.json" << 'SETTINGS_EOF'
 {
   "enabledPlugins": {
@@ -49,18 +65,25 @@ cat > "$CONFIG_DIR/settings.json" << 'SETTINGS_EOF'
   }
 }
 SETTINGS_EOF
+  echo "Settings configured."
+else
+  echo "Settings already exist, skipping."
+fi
 
-echo "Settings configured."
+# Register marketplace and install plugins (only if Claude is already set up)
+# Skip if not set up yet - user needs to run 'claude' first to complete setup
+if [ -s "$CLAUDE_JSON_IN_VOLUME" ] && [ "$(cat "$CLAUDE_JSON_IN_VOLUME")" != "{}" ]; then
+    echo "Registering marketplace..."
+    claude plugin marketplace add "$WORKSPACE" || true
 
-# Register marketplace
-echo "Registering marketplace..."
-claude plugin marketplace add "$WORKSPACE" || true
-
-# Install plugins
-echo "Installing plugins..."
-claude plugin install skills-helper@agentic-skills-creator --scope user
-claude plugin install marketplace-helper@agentic-skills-creator --scope user
-claude plugin install skills-helper-experimental@agentic-skills-creator --scope user
+    echo "Installing plugins..."
+    claude plugin install skills-helper@agentic-skills-creator --scope user || true
+    claude plugin install marketplace-helper@agentic-skills-creator --scope user || true
+    claude plugin install skills-helper-experimental@agentic-skills-creator --scope user || true
+else
+    echo "Claude not yet set up. Run 'claude' to complete setup, then run:"
+    echo "  bash .devcontainer/reinstall-marketplace.sh"
+fi
 
 echo ""
 echo "======================================"
