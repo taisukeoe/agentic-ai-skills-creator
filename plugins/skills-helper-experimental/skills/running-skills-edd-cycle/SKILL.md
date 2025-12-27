@@ -22,7 +22,7 @@ Create evaluations BEFORE writing documentation. This ensures skills solve real 
 2. Document specific failures or missing context
 3. Create 3+ evaluation scenarios that test these gaps
 
-Evaluation scenarios are saved to `tests/scenarios.md` as part of `/creating-effective-skills` workflow (Step 7).
+Evaluation scenarios are saved to `tests/scenarios.md` as the final step of `/creating-effective-skills` workflow.
 
 ### Step 2: Establish Baseline
 
@@ -40,15 +40,15 @@ Create just enough content to address the gaps:
 - Add detail only when tests fail
 - Avoid over-explaining
 
-**REQUIRED:** Run `/creating-effective-skills` before writing any skill content. This ensures proper naming, description format, and structure from the start.
+**REQUIRED:** Use the Skill tool to invoke `creating-effective-skills` before writing any skill content. This ensures proper naming, description format, and structure from the start.
 
 ### Step 4: Evaluate with Multiple Models
 
-> **Note:** This step requires Claude Code CLI. Skip this step if using Claude.ai (model selection not available).
+> **Note:** This step requires Claude Code CLI. Skip if using Claude.ai.
 
-**REQUIRED:** Run `/evaluating-skills-with-models` with the skill path.
+**REQUIRED:** Use the Skill tool to invoke `evaluating-skills-with-models` with the skill path.
 
-The skill will:
+This will:
 1. Auto-load scenarios from `tests/scenarios.md`
 2. Execute with sub-agents across models (sonnet, opus, haiku)
 3. Evaluate against expected behaviors
@@ -56,13 +56,13 @@ The skill will:
 
 **After evaluation:** Document recommended model in skill's metadata.
 
-**REQUIRED:** Run `/improving-skills` when observations reveal issues.
+**REQUIRED:** Use the Skill tool to invoke `improving-skills` when observations reveal issues.
 
 ### Step 5: Final Review
 
 Before considering the skill complete:
 
-**REQUIRED:** Run `/reviewing-skills` to verify compliance with best practices.
+**REQUIRED:** Use the Skill tool to invoke `reviewing-skills` to verify compliance with best practices.
 
 1. Address all compliance issues identified
 2. Re-run evaluations after fixes
