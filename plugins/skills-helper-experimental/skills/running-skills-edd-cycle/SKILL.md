@@ -1,14 +1,14 @@
 ---
-name: running-skill-edd-cycle
+name: running-skills-edd-cycle
 description: Guides evaluation-driven development (EDD) process for agent skills. Use when setting up skill testing workflows, creating skill evaluation scenarios, or establishing Claude A/B feedback loops for skill validation. Provides development methodology, not content guidance.
 license: Apache-2.0
-allowed-tools: "Skill(creating-effective-skills) Skill(improving-skills) Skill(reviewing-skills)"
+allowed-tools: "Skill(creating-effective-skills) Skill(improving-skills) Skill(reviewing-skills) Skill(evaluating-skills-with-models)"
 metadata:
   author: Softgraphy GK
   version: "0.2.0"
 ---
 
-# Running Skill EDD Cycle
+# Running Skills EDD Cycle
 
 Run evaluation-driven development cycle for agent skills.
 
@@ -22,16 +22,7 @@ Create evaluations BEFORE writing documentation. This ensures skills solve real 
 2. Document specific failures or missing context
 3. Create 3+ evaluation scenarios that test these gaps
 
-**Evaluation structure:** See [references/evaluation-structure.md](references/evaluation-structure.md)
-
-```json
-{
-  "skills": ["skill-name"],
-  "query": "User request that triggers this skill",
-  "files": ["test-files/sample.ext"],
-  "expected_behavior": ["Observable action 1", "Observable action 2"]
-}
-```
+Evaluation scenarios are saved to `tests/scenarios.md` as part of `/creating-effective-skills` workflow (Step 7).
 
 ### Step 2: Establish Baseline
 
@@ -55,44 +46,15 @@ Create just enough content to address the gaps:
 
 > **Note:** This step requires Claude Code CLI. Skip this step if using Claude.ai (model selection not available).
 
-Run skill with each model, then evaluate results in parent session:
+**REQUIRED:** Run `/evaluating-skills-with-models` with the skill path.
 
-**Phase 1: Execute (per model)**
+The skill will:
+1. Auto-load scenarios from `tests/scenarios.md`
+2. Execute with sub-agents across models (sonnet, opus, haiku)
+3. Evaluate against expected behaviors
+4. Determine recommended model (least capable with full compatibility)
 
-Spawn Task sub-agents for each model. Agent only **executes** and returns raw output:
-
-```
-Execute the skill at {skill_path} with this query:
-{evaluation_query}
-
-Return:
-- Raw output/files generated
-- Actions taken (tools used, files read/written)
-- Any errors encountered
-
-Do NOT evaluate pass/fail. Just report what happened.
-```
-
-**Phase 2: Evaluate (parent session)**
-
-Collect all raw outputs and evaluate in parent session (consistent criteria):
-
-1. Compare outputs against expected_behavior
-2. Rate each model's compatibility
-3. Note observations (activation timing, missed references, etc.)
-
-**Compatibility ratings:**
-
-| Rating | Meaning |
-|--------|---------|
-| ✅ Full | All evaluations pass |
-| ⚠️ Partial | Some pass, or requires workarounds |
-| ❌ None | Does not function correctly |
-
-**After evaluation:**
-
-1. Determine recommended model (least capable model with ✅ Full compatibility)
-2. Document in skill's description or metadata
+**After evaluation:** Document recommended model in skill's metadata.
 
 **REQUIRED:** Run `/improving-skills` when observations reveal issues.
 

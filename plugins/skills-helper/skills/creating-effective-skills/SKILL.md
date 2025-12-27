@@ -4,7 +4,7 @@ description: Creating high-quality agent skills following Claude's official best
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.1.1"
+  version: "0.2.0"
 ---
 
 # Creating Effective Skills
@@ -60,6 +60,8 @@ skill-name/
 ├── SKILL.md (required - AI agent instructions)
 ├── README.md (optional - human-facing installation and usage guide)
 ├── references/ (optional)
+├── tests/
+│   └── scenarios.md (required - self-evaluation scenarios)
 ├── scripts/ (optional)
 └── assets/ (optional)
 ```
@@ -67,6 +69,11 @@ skill-name/
 **README.md vs SKILL.md**:
 - **SKILL.md**: Instructions for Claude (workflows, patterns, technical details)
 - **README.md**: Instructions for humans (installation, permissions, overview)
+
+**README.md must include**:
+- Overview of what the skill does
+- File structure explanation (especially `tests/scenarios.md` purpose)
+- Installation instructions and required permissions
 
 **Avoid creating**: INSTALLATION_GUIDE.md, CHANGELOG.md, or other redundant docs. Use README.md for human-facing documentation.
 
@@ -122,13 +129,31 @@ skill/
 ├── SKILL.md
 └── references/
     ├── domain_a.md
-    ├── domain_b.md
-    └── domain_c.md
+    └── domain_b.md
 ```
 
 Avoid: deeply nested references, duplicate information, generic file names.
 
-### Step 7: Define allowed-tools
+### Step 7: Create Test Scenarios
+
+Create `tests/scenarios.md` for self-evaluation:
+
+```markdown
+## Scenario: [Name]
+
+**Query:** User request that triggers this skill
+
+**Expected behavior:**
+- Observable action 1
+- Observable action 2
+
+**Test files:** (optional)
+- path/to/test-file.ext
+```
+
+This file is used by `/evaluating-skills-with-models` for automated multi-model testing.
+
+### Step 8: Define allowed-tools
 
 After completing SKILL.md and references, identify which tools the skill uses:
 

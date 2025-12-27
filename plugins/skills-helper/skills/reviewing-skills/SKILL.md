@@ -4,7 +4,7 @@ description: Review agent skills against Claude's official best practices. Use w
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.1.1"
+  version: "0.2.0"
 ---
 
 # Reviewing Skills
@@ -79,7 +79,7 @@ Read and analyze:
 ### Step 3: Detailed Structure Review
 
 **File Organization**:
-- Required: SKILL.md
+- Required: SKILL.md, tests/scenarios.md
 - Optional: README.md (human-facing), references/, scripts/, assets/
 - Should NOT exist: CHANGELOG.md, INSTALLATION_GUIDE.md
 
@@ -109,7 +109,8 @@ Read and analyze:
 - [ ] Validation level matches task risk (high-risk tasks should have validation)
 
 **README.md** (optional but recommended):
-- [ ] If exists, includes installation instructions
+- [ ] If exists, includes installation instructions and required permissions
+- [ ] Explains file structure (especially `tests/scenarios.md` as self-evaluation scenarios)
 - [ ] Clearly human-facing (not duplicating SKILL.md content)
 - [ ] Provides overview and usage guidance
 
@@ -128,6 +129,7 @@ Organize feedback by priority:
 - Duplicate information between SKILL.md and references
 - Deeply nested references
 - Missing progressive disclosure
+- Missing tests/scenarios.md (required for multi-model testing)
 
 **Suggestions** (nice to have):
 - Could be more concise

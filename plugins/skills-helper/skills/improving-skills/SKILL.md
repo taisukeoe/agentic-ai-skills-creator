@@ -4,7 +4,7 @@ description: Improve existing agent skills based on user feedback and best pract
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Improving Skills
@@ -46,6 +46,7 @@ Check against best practices (reference reviewing-skills criteria):
 - **Size**: SKILL.md < 500 lines
 - **Progressive disclosure**: Details in references
 - **Single responsibility**: One clear purpose
+- **Tests**: tests/scenarios.md exists (required for `/evaluating-skills-with-models`)
 
 ### Step 4: Present Improvement Plan
 
