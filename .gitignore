@@ -13,6 +13,7 @@
 
 # Logs
 *.log
+.ai_text/
 
 # Temporary files
 *.tmp
