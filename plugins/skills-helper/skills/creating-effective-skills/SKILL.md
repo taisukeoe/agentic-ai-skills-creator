@@ -136,22 +136,29 @@ Avoid: deeply nested references, duplicate information, generic file names.
 
 ### Step 7: Create Test Scenarios
 
-Create `tests/scenarios.md` for self-evaluation:
+Create `tests/scenarios.md` for self-evaluation with `/evaluating-skills-with-models`:
 
 ```markdown
 ## Scenario: [Name]
 
+**Difficulty:** Easy | Medium | Hard | Edge-case
+
 **Query:** User request that triggers this skill
 
-**Expected behavior:**
-- Observable action 1
-- Observable action 2
+**Expected behaviors:**
 
-**Test files:** (optional)
-- path/to/test-file.ext
+1. [Action description]
+   - **Minimum:** What counts as "did it"
+   - **Quality criteria:** What "did it well" looks like
+   - **Haiku pitfall:** Common failure mode for smaller models
+   - **Weight:** 1-5 (importance)
+
+**Output validation:** (optional)
+- Pattern: `regex`
+- Line count: `< N`
 ```
 
-This file is used by `/evaluating-skills-with-models` for automated multi-model testing.
+**Why this format**: Binary pass/fail doesn't differentiate models. Quality-based scoring reveals capability differences.
 
 ### Step 8: Define allowed-tools
 

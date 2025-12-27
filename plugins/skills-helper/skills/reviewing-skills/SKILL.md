@@ -1,6 +1,6 @@
 ---
 name: reviewing-skills
-description: Check skill files for best practices compliance (naming, description, structure, size). Use when verifying a skill follows conventions, checking SKILL.md quality, or getting feedback before publishing. Static analysis only - reads files but does NOT execute the skill.
+description: Review skill files for best practices compliance (naming, description, structure, size). Use when checking SKILL.md quality or getting feedback before publishing. Static analysis only - does NOT execute the skill.
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
