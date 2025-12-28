@@ -14,10 +14,10 @@ echo "Setting up Claude Code devcontainer..."
 # Ensure required directories have correct ownership (volumes may be owned by root initially)
 for dir in "$CONFIG_DIR" "$HOME/.local/share/claude" "$HOME/.local/state" "$HOME/.local/bin"; do
     if [ -d "$dir" ]; then
-        sudo chown -R $(id -u):$(id -g) "$dir"
+        sudo chown -R "$(id -u):$(id -g)" "$dir"
     else
         sudo mkdir -p "$dir"
-        sudo chown -R $(id -u):$(id -g) "$dir"
+        sudo chown -R "$(id -u):$(id -g)" "$dir"
     fi
 done
 
@@ -37,6 +37,8 @@ fi
 # Install Claude Code if not present
 if ! command -v claude &> /dev/null; then
     echo "Installing Claude Code..."
+    # NOTE: This uses the official Claude Code installation method.
+    # The script is fetched over HTTPS but no additional checksum verification is performed.
     curl -fsSL https://claude.ai/install.sh | bash
 else
     echo "Claude Code already installed."
