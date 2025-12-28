@@ -45,47 +45,66 @@
      - Installs curl, git, jq, ca-certificates, sudo, zsh
      - Creates non-root vscode user with zsh as default shell
      - Handles existing UID/GID 1000 in base image (ubuntu user)
-     - Sets PATH for ~/.local/bin (Claude Code default install location)
+     - Sets PATH for ~/.local/bin and VOLTA_HOME (for Codex if enabled)
      - Configures passwordless sudo for vscode user
      - Does NOT install Claude Code (deferred to post-create.sh)
-   - **Haiku pitfall:** Installs Claude Code in Dockerfile, missing sudo/zsh, hardcodes user creation without checking existing UID
+     - If Codex enabled: Installs Volta, Node.js, and Codex CLI via volta install
+   - **Haiku pitfall:** Installs Claude Code in Dockerfile, missing sudo/zsh, hardcodes user creation without checking existing UID, uses npm instead of volta for Codex
    - **Weight:** 4
 
 5. Generates post-create.sh with correct structure
    - **Minimum:** Creates executable shell script
    - **Quality criteria:**
-     - Exports PATH with $HOME/.local/bin at the beginning
-     - Fixes volume ownership with sudo chown before accessing
+     - Exports PATH with VOLTA_HOME/bin and $HOME/.local/bin
+     - Fixes volume ownership with sudo chown before accessing (including ~/.codex if enabled)
      - Checks if Claude Code already installed using `command -v claude`
      - Generates settings.json with enabledPlugins as OBJECT (not array)
      - Includes all discovered skills in permissions.allow
      - Registers marketplace and installs plugins
-   - **Haiku pitfall:** Uses array format for enabledPlugins, missing PATH export, missing sudo chown for volume
+     - If Codex enabled: Syncs skills to ~/.codex/skills/ via sync-codex-skills.sh
+   - **Haiku pitfall:** Uses array format for enabledPlugins, missing PATH export, missing sudo chown for volume, forgets Codex skill sync
    - **Weight:** 5
 
 6. Generates reinstall-marketplace.sh
    - **Minimum:** Creates script that can be executed
    - **Quality criteria:**
-     - Exports PATH with $HOME/.local/bin at the beginning
+     - Exports PATH with VOLTA_HOME/bin and $HOME/.local/bin
      - Handles --quiet flag
      - Uses $HOME/.claude for config directory
      - Properly quotes paths and handles edge cases
-   - **Haiku pitfall:** Hardcodes paths, missing PATH export, missing error handling
+     - If Codex enabled: Also syncs skills to Codex after marketplace reinstall
+   - **Haiku pitfall:** Hardcodes paths, missing PATH export, missing error handling, forgets Codex sync
+   - **Weight:** 3
+
+7. Generates sync-codex-skills.sh (if Codex enabled)
+   - **Minimum:** Creates executable script
+   - **Quality criteria:**
+     - Copies skills from plugins/*/skills/*/ to ~/.codex/skills/
+     - Uses rm -rf and cp -r to ensure fresh copy (Codex ignores symlinks)
+     - Handles --quiet flag
+     - Reports count of synced skills
+   - **Haiku pitfall:** Uses symlinks (Codex ignores them), wrong skill path discovery
    - **Weight:** 3
 
 **Output validation:**
 - Directory: `.devcontainer/` exists
 - Files: `devcontainer.json`, `Dockerfile`, `post-create.sh`, `reinstall-marketplace.sh`
+- Files (if Codex enabled): `sync-codex-skills.sh`
 - Pattern in devcontainer.json: `"type": "volume"` (not bind mount)
+- Pattern in devcontainer.json (if Codex): `codex-config-` volume mount
 - Pattern in Dockerfile: `zsh` in apt-get install list
 - Pattern in Dockerfile: `-s /bin/zsh` in useradd/usermod command
 - Pattern in Dockerfile: `getent group` and `getent passwd` for UID/GID handling
 - Pattern in Dockerfile: `sudoers.d` for passwordless sudo
-- Pattern in Dockerfile: `PATH="/home/vscode/.local/bin:$PATH"`
-- Pattern in post-create.sh: `export PATH="$HOME/.local/bin:$PATH"`
-- Pattern in post-create.sh: `sudo chown` for volume ownership
+- Pattern in Dockerfile: `VOLTA_HOME` and `PATH` environment variables
+- Pattern in Dockerfile (if Codex): `volta install node` and `volta install @openai/codex`
+- Pattern in post-create.sh: `export VOLTA_HOME` and `export PATH` with both paths
+- Pattern in post-create.sh: `sudo chown` for volume ownership (including ~/.codex)
 - Pattern in post-create.sh: `"enabledPlugins": {` (object, not array)
-- Pattern in reinstall-marketplace.sh: `export PATH="$HOME/.local/bin:$PATH"`
+- Pattern in post-create.sh (if Codex): `sync-codex-skills.sh` call
+- Pattern in reinstall-marketplace.sh: `export VOLTA_HOME` and `export PATH`
+- Pattern in reinstall-marketplace.sh (if Codex): `sync-codex-skills.sh` call
+- Pattern in sync-codex-skills.sh (if Codex): `cp -r` (NOT symlink)
 
 ---
 
@@ -261,7 +280,8 @@
    - **Minimum:** Mentions named volumes for persistence
    - **Quality criteria:**
      - Explains using named volumes for ~/.claude and ~/.local/share/claude
-     - Describes what's stored (credentials, settings, plugins config)
+     - If Codex enabled: Also explains ~/.codex volume for Codex persistence
+     - Describes what's stored (credentials, settings, plugins config, Codex skills)
      - Notes Claude binary is installed to ~/.local/bin (not in volume)
      - Explains volume persistence benefits across container rebuilds
    - **Haiku pitfall:** Vague explanation, confuses binary location with config, doesn't mention volume persistence
@@ -273,6 +293,7 @@
      - Describes postCreateCommand vs postStartCommand difference
      - Explains when Claude Code is installed
      - Explains when marketplace is synced
+     - If Codex enabled: Explains skill sync to ~/.codex/skills/
    - **Haiku pitfall:** Conflates the two commands, incomplete sequence
    - **Weight:** 3
 
@@ -281,9 +302,100 @@
    - **Quality criteria:**
      - Named volume vs bind mount comparison
      - Explains why credentials survive container rebuild
-     - Notes user needs to login once
+     - Notes user needs to login once (both Claude and Codex if enabled)
    - **Haiku pitfall:** Doesn't explain why named volume chosen
+   - **Weight:** 3
+
+4. Explains Codex skill sync (if Codex enabled)
+   - **Minimum:** Mentions skills are synced
+   - **Quality criteria:**
+     - Explains why copy instead of symlink (Codex ignores symlinks)
+     - Describes sync-codex-skills.sh purpose
+     - Notes skills need re-sync after editing
+   - **Haiku pitfall:** Suggests symlinks, forgets sync step
    - **Weight:** 3
 
 **Output validation:**
 - Response mentions: named volume, ~/.claude, postCreateCommand, postStartCommand
+- If Codex: mentions ~/.codex, skill sync, copy (not symlink)
+
+---
+
+## Scenario: Generate devcontainer with Codex CLI support
+
+**Difficulty:** Medium
+
+**Query:** Set up a devcontainer for my marketplace with Codex CLI support enabled.
+
+**Test files:**
+- `.claude-plugin/marketplace.json` with 1-2 plugins
+
+**Expected behaviors:**
+
+1. Asks about Codex CLI support
+   - **Minimum:** Mentions Codex as an option
+   - **Quality criteria:**
+     - Explicitly asks user if they want Codex CLI support
+     - Explains what Codex adds (Volta, Node.js, Codex CLI, skill sync)
+     - Clarifies this is optional
+   - **Haiku pitfall:** Assumes Codex without asking, or forgets to ask
+   - **Weight:** 3
+
+2. Generates Dockerfile with Volta and Codex
+   - **Minimum:** Includes Volta installation
+   - **Quality criteria:**
+     - Sets VOLTA_HOME and PATH environment variables
+     - Uses `volta install node` (not npm/nvm)
+     - Uses `volta install @openai/codex` (not npm i -g)
+     - Installs after USER switch (as vscode user, not root)
+   - **Haiku pitfall:** Uses npm instead of volta, installs as root, missing VOLTA_HOME
+   - **Weight:** 5
+
+3. Generates devcontainer.json with Codex volume
+   - **Minimum:** Includes codex-config volume
+   - **Quality criteria:**
+     - Adds third volume for ~/.codex
+     - Volume name includes marketplace name for uniqueness
+     - Format matches existing claude volumes
+   - **Haiku pitfall:** Forgets Codex volume, wrong mount path
+   - **Weight:** 4
+
+4. Generates sync-codex-skills.sh
+   - **Minimum:** Creates the script
+   - **Quality criteria:**
+     - Uses cp -r (NOT symlinks - Codex ignores them)
+     - Discovers skills from plugins/*/skills/*/
+     - Checks for SKILL.md in each directory
+     - Removes existing target before copy (rm -rf)
+     - Handles --quiet flag
+   - **Haiku pitfall:** Uses symlinks, wrong skill discovery path
+   - **Weight:** 5
+
+5. Updates post-create.sh for Codex
+   - **Minimum:** Includes Codex section
+   - **Quality criteria:**
+     - Adds ~/.codex to chown loop
+     - Calls sync-codex-skills.sh
+     - Adds codex-f alias
+     - Updates completion message to mention Codex
+   - **Haiku pitfall:** Missing chown for ~/.codex, forgets skill sync call
+   - **Weight:** 4
+
+6. Updates reinstall-marketplace.sh for Codex
+   - **Minimum:** Includes Codex sync
+   - **Quality criteria:**
+     - Checks if codex command exists before sync
+     - Calls sync-codex-skills.sh with --quiet flag passthrough
+   - **Haiku pitfall:** Syncs without checking codex exists
+   - **Weight:** 3
+
+**Output validation:**
+- Pattern in Dockerfile: `VOLTA_HOME="/home/vscode/.volta"`
+- Pattern in Dockerfile: `volta install node`
+- Pattern in Dockerfile: `volta install @openai/codex`
+- Pattern in devcontainer.json: `codex-config-`
+- File exists: `sync-codex-skills.sh`
+- Pattern in sync-codex-skills.sh: `cp -r` (NOT `ln -s`)
+- Pattern in post-create.sh: `sync-codex-skills.sh`
+- Pattern in post-create.sh: `codex-f`
+- Pattern in reinstall-marketplace.sh: `command -v codex`

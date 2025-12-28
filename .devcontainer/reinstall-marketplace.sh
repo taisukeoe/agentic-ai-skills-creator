@@ -14,8 +14,9 @@
 # but this adds ~5-10 seconds delay on every container start.
 # =============================================================================
 
-# Ensure Claude Code is in PATH
-export PATH="$HOME/.local/bin:$PATH"
+# Ensure Claude Code and Volta are in PATH
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$HOME/.local/bin:$PATH"
 
 QUIET="${1:-}"
 SRC="/workspaces/agentic-ai-skills-creator"
@@ -67,4 +68,11 @@ reinstall_marketplace() {
 
 [[ "$QUIET" != "--quiet" ]] && echo "Reinstalling marketplace from $SRC..."
 reinstall_marketplace "$SRC"
+
+# Also sync skills to Codex CLI
+if command -v codex &> /dev/null; then
+    [[ "$QUIET" != "--quiet" ]] && echo "Syncing skills to Codex..."
+    bash "$SRC/.devcontainer/sync-codex-skills.sh" "$QUIET"
+fi
+
 [[ "$QUIET" != "--quiet" ]] && echo "Done."

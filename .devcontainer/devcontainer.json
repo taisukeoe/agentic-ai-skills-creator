@@ -5,7 +5,8 @@
   },
   "mounts": [
     "source=claude-config-agentic-skills-creator,target=/home/vscode/.claude,type=volume",
-    "source=claude-data-agentic-skills-creator,target=/home/vscode/.local/share/claude,type=volume"
+    "source=claude-data-agentic-skills-creator,target=/home/vscode/.local/share/claude,type=volume",
+    "source=codex-config-agentic-skills-creator,target=/home/vscode/.codex,type=volume"
   ],
   "remoteUser": "vscode",
   "postCreateCommand": "bash .devcontainer/post-create.sh",

@@ -6,13 +6,14 @@ set -e
 CONFIG_DIR="$HOME/.claude"
 WORKSPACE="/workspaces/agentic-ai-skills-creator"
 
-# Ensure Claude Code is in PATH
-export PATH="$HOME/.local/bin:$PATH"
+# Ensure Claude Code and Volta are in PATH
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$HOME/.local/bin:$PATH"
 
 echo "Setting up Claude Code devcontainer..."
 
 # Ensure required directories have correct ownership (volumes may be owned by root initially)
-for dir in "$CONFIG_DIR" "$HOME/.local/share/claude" "$HOME/.local/state" "$HOME/.local/bin"; do
+for dir in "$CONFIG_DIR" "$HOME/.local/share/claude" "$HOME/.local/state" "$HOME/.codex"; do
     if [ -d "$dir" ]; then
         sudo chown -R "$(id -u):$(id -g)" "$dir"
     else
@@ -34,15 +35,7 @@ if [ ! -L "$HOME/.claude.json" ]; then
     ln -sf "$CLAUDE_JSON_IN_VOLUME" "$HOME/.claude.json"
 fi
 
-# Install Claude Code if not present
-if ! command -v claude &> /dev/null; then
-    echo "Installing Claude Code..."
-    # NOTE: This uses the official Claude Code installation method.
-    # The script is fetched over HTTPS but no additional checksum verification is performed.
-    curl -fsSL https://claude.ai/install.sh | bash
-else
-    echo "Claude Code already installed."
-fi
+# Claude Code is pre-installed in the Docker image
 
 # Create shell aliases file in the volume (persists across rebuilds)
 ALIASES_FILE="$CONFIG_DIR/.shell-aliases"
@@ -50,6 +43,9 @@ if [ ! -f "$ALIASES_FILE" ]; then
     cat > "$ALIASES_FILE" << 'ALIASES_EOF'
 # Claude Code aliases (persisted in volume)
 alias claude-y='claude --dangerously-skip-permissions'
+
+# Codex CLI aliases
+alias codex-f='codex --full-auto'
 ALIASES_EOF
     echo "Shell aliases created: $ALIASES_FILE"
 fi
@@ -97,13 +93,24 @@ else
     echo "  bash .devcontainer/reinstall-marketplace.sh"
 fi
 
+# ============================================
+# Codex CLI Setup
+# ============================================
+echo ""
+echo "Setting up Codex CLI..."
+
+# Sync skills to Codex
+echo "Syncing skills to Codex..."
+bash "$WORKSPACE/.devcontainer/sync-codex-skills.sh" || true
+
 echo ""
 echo "======================================"
-echo "Claude Code devcontainer ready!"
+echo "Claude Code + Codex CLI devcontainer ready!"
 echo ""
 echo "Run 'claude' to complete initial setup (first time only)."
 echo "Your credentials will persist across container rebuilds."
 echo ""
-echo "Alias available (after shell restart):"
+echo "Aliases available (after shell restart):"
 echo "  claude-y  - claude --dangerously-skip-permissions"
+echo "  codex-f   - codex --full-auto"
 echo "======================================"

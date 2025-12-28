@@ -10,9 +10,9 @@ metadata:
 # Setting Up Devcontainers for Claude Code Marketplaces
 
 Generate complete `.devcontainer/` configurations for Claude Code plugin marketplaces with:
-- Pre-installed Claude Code CLI
+- Pre-installed Claude Code and Codex CLI (built into Docker image)
 - Auto-enabled plugins and skills
-- Persistent credentials via Docker volumes
+- Persistent credentials and config via Docker volumes
 - Automatic marketplace synchronization
 
 ## Quick Start
@@ -53,7 +53,26 @@ For each plugin in `marketplace.json`:
 - `enabledPlugins`: `{"plugin-name@marketplace-name": true, ...}`
 - `allowedSkills`: `["Skill(skill-1)", "Skill(skill-2)", ...]`
 
-### Step 3: Ask About Auto-Sync on Container Start
+### Step 3: Ask About Codex CLI Support (Optional)
+
+**Ask the user explicitly**:
+
+> Do you want to add Codex CLI (OpenAI) support alongside Claude Code?
+>
+> - **Yes**: Adds Volta, Node.js, Codex CLI, and skill sync mechanism
+> - **No** (default): Claude Code only
+
+If yes:
+- Add Volta/Node.js/Codex CLI installation to Dockerfile (installed at build time)
+- Add `~/.codex/` volume mount for config persistence
+- Add `sync-codex-skills.sh` script (copies skills to `~/.codex/skills/`)
+- Add Codex sync call to `post-create.sh`
+
+**Note**: Both Claude Code and Codex CLI are installed at Docker build time for faster container startup.
+
+**Note**: Codex ignores symlinked directories, so skills must be copied (not linked).
+
+### Step 4: Ask About Auto-Sync on Container Start
 
 **Ask the user explicitly**:
 
@@ -65,7 +84,7 @@ For each plugin in `marketplace.json`:
 > Note: This is a workaround for Claude Code not detecting local plugin changes.
 > Running on every start adds ~5-10 seconds delay.
 
-### Step 4: Generate Files from Templates
+### Step 5: Generate Files from Templates
 
 Use the templates in `templates/` directory, substituting placeholders:
 
@@ -76,22 +95,33 @@ Use the templates in `templates/` directory, substituting placeholders:
 | `{{ENABLED_PLUGINS}}` | Object entries like `"plugin@market": true` |
 | `{{ALLOWED_SKILLS}}` | Array entries like `"Skill(name)"` |
 | `{{PLUGIN_INSTALL_COMMANDS}}` | Plugin install commands (with `|| true`) |
+| `{{CODEX_VOLUME_MOUNT}}` | If Codex: `,\n    "source=codex-config-{{MARKETPLACE_NAME}},..."` else: empty |
+| `{{CODEX_INSTALL_BLOCK}}` | If Codex: Volta/Codex RUN command, else: comment |
+| `{{CODEX_DIR_LIST}}` | If Codex: ` "$HOME/.codex"` else: empty |
+| `{{CODEX_ALIASES}}` | If Codex: Codex alias lines, else: empty |
+| `{{CODEX_SETUP_BLOCK}}` | If Codex: Codex setup in post-create.sh, else: empty |
+| `{{CODEX_ALIAS_ECHO}}` | If Codex: `echo "  codex-f   - codex --full-auto"` else: empty |
+| `{{CODEX_SYNC_BLOCK}}` | If Codex: Codex sync in reinstall-marketplace.sh, else: empty |
+| `{{DEVCONTAINER_READY_MESSAGE}}` | "Claude Code devcontainer ready!" or "Claude Code + Codex CLI devcontainer ready!" |
 
 **Templates**:
 - [devcontainer.json.template](templates/devcontainer.json.template) - Container configuration
 - [Dockerfile.template](templates/Dockerfile.template) - Ubuntu + dependencies
 - [post-create.sh.template](templates/post-create.sh.template) - Initial setup
 - [reinstall-marketplace.sh.template](templates/reinstall-marketplace.sh.template) - Marketplace sync
+- [sync-codex-skills.sh.template](templates/sync-codex-skills.sh.template) - Codex skill sync (if Codex enabled)
 
-**If user chose no auto-sync**: Remove `postStartCommand` from devcontainer.json.
+**Conditional logic**:
+- **If user chose no auto-sync**: Remove `postStartCommand` from devcontainer.json
+- **If user chose no Codex**: Omit Volta/Codex sections and sync-codex-skills.sh
 
-### Step 5: Write Files and Set Permissions
+### Step 6: Write Files and Set Permissions
 
 1. Create `.devcontainer/` directory if not exists
 2. Write all generated files (without `.template` suffix)
 3. Make shell scripts executable: `chmod +x .devcontainer/*.sh`
 
-### Step 6: Provide Usage Instructions
+### Step 7: Provide Usage Instructions
 
 ```
 Devcontainer files created in .devcontainer/
@@ -112,19 +142,24 @@ To manually sync marketplace changes:
 
 ```
 .devcontainer/
-├── devcontainer.json      # Container configuration
-├── Dockerfile             # Ubuntu + dependencies
-├── post-create.sh         # Initial setup (Claude install, config)
-└── reinstall-marketplace.sh  # Marketplace sync script
+├── devcontainer.json         # Container configuration
+├── Dockerfile                # Ubuntu + Claude Code (+ Volta/Codex if enabled)
+├── post-create.sh            # Initial setup (config, marketplace, Codex sync)
+├── reinstall-marketplace.sh  # Marketplace sync script (+ Codex sync if enabled)
+└── sync-codex-skills.sh      # Codex skill sync (only if Codex enabled)
 ```
 
 ## Key Configuration Details
 
 ### Volume Strategy
 
-Uses two named Docker volumes plus a symlink for complete persistence:
+Uses named Docker volumes plus a symlink for complete persistence:
 
 ```
+Docker Image (built once):
+├── ~/.local/bin/claude      # Claude Code binary
+└── ~/.volta/                # Volta + Node.js + Codex CLI (if enabled)
+
 Volume 1: claude-config-${MARKETPLACE_NAME} → ~/.claude/
 ├── .home-claude.json        # Setup state (symlink target)
 ├── .credentials.json        # Auth tokens
@@ -132,20 +167,27 @@ Volume 1: claude-config-${MARKETPLACE_NAME} → ~/.claude/
 └── plugins/                 # Plugin data
 
 Volume 2: claude-data-${MARKETPLACE_NAME} → ~/.local/share/claude/
-└── versions/
-    └── X.X.X                # Claude Code binary
+└── (Claude Code data)       # Session data, etc.
+
+Volume 3 (if Codex enabled): codex-config-${MARKETPLACE_NAME} → ~/.codex/
+├── config.toml              # Codex CLI configuration
+├── sessions/                # Session data
+└── skills/                  # Synced skills from marketplace
 
 Symlink (created by post-create.sh):
 ~/.claude.json → ~/.claude/.home-claude.json
 ```
 
-**Why three persistence mechanisms?**
+**Why this architecture?**
 
 | Location | Purpose | Persistence Method |
 |----------|---------|-------------------|
+| `~/.local/bin/claude` | Claude Code binary | Docker image (fast startup) |
+| `~/.volta/` | Codex CLI binary | Docker image (fast startup) |
 | `~/.claude/` | Config, credentials, settings | Volume mount |
-| `~/.local/share/claude/` | Binary (216MB) | Volume mount |
+| `~/.local/share/claude/` | Claude session data | Volume mount |
 | `~/.claude.json` | Initial setup state | Symlink to volume |
+| `~/.codex/` (optional) | Codex config, sessions, skills | Volume mount |
 
 **Important**: `~/.claude.json` cannot be directly mounted as a volume (Docker creates a directory instead of a file). The symlink approach allows the file to persist inside the `~/.claude/` volume.
 
@@ -159,6 +201,9 @@ The setup creates a persistent alias file in the volume:
 ```bash
 # ~/.claude/.shell-aliases (persisted)
 alias claude-y='claude --dangerously-skip-permissions'
+
+# If Codex enabled:
+alias codex-f='codex --full-auto'
 ```
 
 This survives container rebuilds because the alias file is stored in the volume.
@@ -208,3 +253,4 @@ This survives container rebuilds because the alias file is stored in the volume.
 
 - [Devcontainer Specification](references/devcontainer-spec.md)
 - [Claude Code Installation](references/claude-code-installation.md)
+- [Codex CLI Installation](references/codex-cli-installation.md)
