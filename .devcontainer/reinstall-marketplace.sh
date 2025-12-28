@@ -1,9 +1,18 @@
 #!/bin/bash
-# Reinstall marketplace and plugins for local development
+# =============================================================================
+# WORKAROUND: Reinstall marketplace and plugins for local development
 # Generated for: agentic-skills-creator
+# =============================================================================
+# This script is a workaround for Claude Code not automatically detecting
+# changes to local plugin/skill files. Until Claude Code supports file watching
+# for local marketplaces, this script must be run manually after editing skills.
 #
-# Run manually or via postStartCommand
-# Usage: bash reinstall-marketplace.sh [--quiet]
+# Usage:
+#   bash reinstall-marketplace.sh [--quiet]
+#
+# Can be configured in devcontainer.json as postStartCommand for auto-sync,
+# but this adds ~5-10 seconds delay on every container start.
+# =============================================================================
 
 # Ensure Claude Code is in PATH
 export PATH="$HOME/.local/bin:$PATH"
@@ -11,6 +20,15 @@ export PATH="$HOME/.local/bin:$PATH"
 QUIET="${1:-}"
 SRC="/workspaces/agentic-ai-skills-creator"
 CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+
+# Ensure shell aliases are sourced in .zshrc (runs on every container start)
+ALIASES_FILE="$CONFIG_DIR/.shell-aliases"
+if [ -f "$ALIASES_FILE" ] && ! grep -q "source.*\.shell-aliases" "$HOME/.zshrc" 2>/dev/null; then
+    echo "" >> "$HOME/.zshrc"
+    echo "# Source Claude Code aliases from volume" >> "$HOME/.zshrc"
+    echo "source \"$ALIASES_FILE\" 2>/dev/null || true" >> "$HOME/.zshrc"
+    [[ "$QUIET" != "--quiet" ]] && echo "Shell aliases configured in .zshrc"
+fi
 
 reinstall_marketplace() {
   local src="$1"

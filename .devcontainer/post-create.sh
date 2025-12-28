@@ -42,6 +42,16 @@ else
     echo "Claude Code already installed."
 fi
 
+# Create shell aliases file in the volume (persists across rebuilds)
+ALIASES_FILE="$CONFIG_DIR/.shell-aliases"
+if [ ! -f "$ALIASES_FILE" ]; then
+    cat > "$ALIASES_FILE" << 'ALIASES_EOF'
+# Claude Code aliases (persisted in volume)
+alias claude-y='claude --dangerously-skip-permissions'
+ALIASES_EOF
+    echo "Shell aliases created: $ALIASES_FILE"
+fi
+
 # Generate settings.json with enabled plugins and permissions (only if not exists)
 mkdir -p "$CONFIG_DIR"
 if [ ! -f "$CONFIG_DIR/settings.json" ]; then
@@ -89,6 +99,9 @@ echo ""
 echo "======================================"
 echo "Claude Code devcontainer ready!"
 echo ""
-echo "Run 'claude login' to authenticate."
+echo "Run 'claude' to complete initial setup (first time only)."
 echo "Your credentials will persist across container rebuilds."
+echo ""
+echo "Alias available (after shell restart):"
+echo "  claude-y  - claude --dangerously-skip-permissions"
 echo "======================================"

@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     sudo \
     zsh \
+    python3 \
+    ripgrep \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user (handle case where GID/UID 1000 already exists)

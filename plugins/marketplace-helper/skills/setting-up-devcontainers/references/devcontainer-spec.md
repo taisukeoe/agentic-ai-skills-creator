@@ -4,11 +4,10 @@ Quick reference for devcontainer.json configuration relevant to Claude Code setu
 
 ## Contents
 
-- [Key Fields](#key-fields) - build, mounts, containerEnv, remoteUser
+- [Key Fields](#key-fields) - build, mounts, remoteUser
 - [Lifecycle Commands](#lifecycle-commands) - postCreateCommand, postStartCommand
 - [Volume Naming](#volume-naming) - marketplace-specific volumes
 - [Dockerfile Requirements](#dockerfile-requirements) - packages, user creation, PATH
-- [Example](#example-complete-devcontainerjson) - complete configuration
 
 ## Key Fields
 
@@ -42,19 +41,6 @@ Mount volumes or directories:
 - `volume` - Named Docker volume (persistent across rebuilds)
 - `bind` - Bind mount from host filesystem
 
-### containerEnv
-
-Environment variables inside container:
-
-```json
-{
-  "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/opt/claude-config",
-    "MY_VAR": "value"
-  }
-}
-```
-
 ### remoteUser
 
 Non-root user to use:
@@ -86,7 +72,8 @@ Non-root user to use:
 For Claude Code, use marketplace-specific volume names:
 
 ```
-claude-config-{marketplace-name}
+claude-config-{marketplace-name}   → ~/.claude
+claude-data-{marketplace-name}     → ~/.local/share/claude
 ```
 
 This allows multiple marketplaces to have independent credential stores.
@@ -96,7 +83,7 @@ This allows multiple marketplaces to have independent credential stores.
 Required packages for Claude Code:
 ```dockerfile
 RUN apt-get update && apt-get install -y \
-    curl git jq ca-certificates sudo zsh \
+    curl git jq ca-certificates sudo zsh python3 ripgrep \
     && rm -rf /var/lib/apt/lists/*
 ```
 
@@ -121,7 +108,6 @@ RUN if getent group $USER_GID > /dev/null 2>&1; then \
 
 PATH configuration (binary installed to ~/.local/bin):
 ```dockerfile
-ENV CLAUDE_CONFIG_DIR=/opt/claude-config
 ENV PATH="/home/vscode/.local/bin:$PATH"
 ```
 
@@ -134,18 +120,11 @@ ENV PATH="/home/vscode/.local/bin:$PATH"
     "dockerfile": "Dockerfile"
   },
   "mounts": [
-    "source=claude-config-my-marketplace,target=/opt/claude-config,type=volume"
+    "source=claude-config-my-marketplace,target=/home/vscode/.claude,type=volume",
+    "source=claude-data-my-marketplace,target=/home/vscode/.local/share/claude,type=volume"
   ],
-  "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/opt/claude-config"
-  },
   "remoteUser": "vscode",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": "bash .devcontainer/reinstall-marketplace.sh"
 }
 ```
-
-## References
-
-- [Devcontainer Specification](https://containers.dev/implementors/json_reference/)
-- [VS Code Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers)
