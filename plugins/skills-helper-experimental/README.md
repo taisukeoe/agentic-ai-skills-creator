@@ -7,7 +7,7 @@ Experimental skills for AI agent skill development, including testing and iterat
 ## Installation
 
 ```bash
-/plugin install skills-helper-experimental@agentic-ai-skills-creator
+/plugin install skills-helper-experimental@agentic-skills-creator
 ```
 
 ## Skills

@@ -16,7 +16,7 @@ Skills for AI agent skill development.
 
 | Skill | Description |
 |-------|-------------|
-| `creating-effective-skills` | Guide for creating skills with 7-step workflow |
+| `creating-effective-skills` | Guide for creating skills with 9-step workflow |
 | `evaluating-skills-with-models` | Evaluate skills across sonnet, opus, haiku models |
 | `improving-skills` | Improve existing skills based on user feedback |
 | `reviewing-skills` | Review skills against best practices with compliance checks |
@@ -44,9 +44,9 @@ Experimental skills for skill development.
 
 ```bash
 /plugin marketplace add taisukeoe/agentic-ai-skills-creator
-/plugin install skills-helper@agentic-ai-skills-creator
-/plugin install marketplace-helper@agentic-ai-skills-creator
-/plugin install skills-helper-experimental@agentic-ai-skills-creator  # Optional
+/plugin install skills-helper@agentic-skills-creator
+/plugin install marketplace-helper@agentic-skills-creator
+/plugin install skills-helper-experimental@agentic-skills-creator  # Optional
 ```
 
 ### From Local Path (Development)
@@ -67,7 +67,7 @@ After installation, restart Claude Code to activate the skills.
 Create a skill for processing PDF files
 ```
 
-Claude will guide you through the 7-step workflow to create a properly structured skill.
+Claude will guide you through the 9-step workflow to create a properly structured skill.
 
 ### Reviewing an Existing Skill
 

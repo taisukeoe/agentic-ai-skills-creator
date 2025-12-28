@@ -5,7 +5,7 @@ Skills for reviewing and validating Claude Code plugin marketplace configuration
 ## Installation
 
 ```bash
-/plugin install marketplace-helper@agentic-ai-skills-creator
+/plugin install marketplace-helper@agentic-skills-creator
 ```
 
 ## Skills

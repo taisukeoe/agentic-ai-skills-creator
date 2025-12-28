@@ -5,7 +5,7 @@ Skills for creating, reviewing, and improving effective AI agent skills followin
 ## Installation
 
 ```bash
-/plugin install skills-helper@agentic-ai-skills-creator
+/plugin install skills-helper@agentic-skills-creator
 ```
 
 ## Skills
@@ -20,7 +20,7 @@ Guide for creating high-quality agent skills that follow Claude's official best 
 - Description writing guidelines
 - Degrees of freedom determination
 - File organization best practices
-- 7-step workflow for skill creation
+- 9-step workflow for skill creation
 
 **Use when:**
 - Designing new agent skills
