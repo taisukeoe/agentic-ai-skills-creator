@@ -96,12 +96,17 @@ fi
 # ============================================
 # Codex CLI Setup
 # ============================================
-echo ""
-echo "Setting up Codex CLI..."
+if command -v codex &> /dev/null; then
+    echo ""
+    echo "Setting up Codex CLI..."
 
-# Sync skills to Codex
-echo "Syncing skills to Codex..."
-bash "$WORKSPACE/.devcontainer/sync-codex-skills.sh" || true
+    # Sync skills to Codex
+    echo "Syncing skills to Codex..."
+    bash "$WORKSPACE/.devcontainer/sync-codex-skills.sh" || true
+else
+    echo ""
+    echo "Codex CLI not found in PATH. Skipping Codex skills sync."
+fi
 
 echo ""
 echo "======================================"

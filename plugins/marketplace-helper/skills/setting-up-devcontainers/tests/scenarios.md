@@ -47,7 +47,7 @@
      - Handles existing UID/GID 1000 in base image (ubuntu user)
      - Sets PATH for ~/.local/bin and VOLTA_HOME (for Codex if enabled)
      - Configures passwordless sudo for vscode user
-     - Does NOT install Claude Code (deferred to post-create.sh)
+     - Installs Claude Code at build time
      - If Codex enabled: Installs Volta, Node.js, and Codex CLI via volta install
    - **Haiku pitfall:** Installs Claude Code in Dockerfile, missing sudo/zsh, hardcodes user creation without checking existing UID, uses npm instead of volta for Codex
    - **Weight:** 4
@@ -57,7 +57,7 @@
    - **Quality criteria:**
      - Exports PATH with VOLTA_HOME/bin and $HOME/.local/bin
      - Fixes volume ownership with sudo chown before accessing (including ~/.codex if enabled)
-     - Checks if Claude Code already installed using `command -v claude`
+     - Assumes Claude Code is already available in PATH from the base image (does not attempt to install it)
      - Generates settings.json with enabledPlugins as OBJECT (not array)
      - Includes all discovered skills in permissions.allow
      - Registers marketplace and installs plugins

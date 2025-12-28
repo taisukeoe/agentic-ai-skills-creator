@@ -11,7 +11,7 @@ ENV PATH="$VOLTA_HOME/bin:/home/vscode/.local/bin:$PATH"
 
 USER $USERNAME
 
-RUN curl https://get.volta.sh | bash \
+RUN curl -fsSL https://get.volta.sh | bash \
     && $VOLTA_HOME/bin/volta install node \
     && $VOLTA_HOME/bin/volta install @openai/codex
 ```
