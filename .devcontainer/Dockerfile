@@ -30,7 +30,18 @@ RUN if getent group $USER_GID > /dev/null 2>&1; then \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Claude Code: binary at ~/.local/bin, config at ~/.claude (both defaults)
-ENV PATH="/home/vscode/.local/bin:$PATH"
+# Volta: Node.js version manager at ~/.volta
+ENV VOLTA_HOME="/home/vscode/.volta"
+ENV PATH="$VOLTA_HOME/bin:/home/vscode/.local/bin:$PATH"
 
 USER $USERNAME
+
+# Install Volta, Node.js (LTS), and Codex CLI
+RUN curl -fsSL https://get.volta.sh | bash \
+    && $VOLTA_HOME/bin/volta install node@22.21 \
+    && $VOLTA_HOME/bin/volta install @openai/codex
+
+# Install Claude Code
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
 WORKDIR /workspaces

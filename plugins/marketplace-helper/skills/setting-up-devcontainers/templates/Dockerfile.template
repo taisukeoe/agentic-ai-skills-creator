@@ -32,5 +32,11 @@ RUN if getent group $USER_GID > /dev/null 2>&1; then \
 # Claude Code: binary at ~/.local/bin, config at ~/.claude (both defaults)
 ENV PATH="/home/vscode/.local/bin:$PATH"
 
+{{VOLTA_ENV_BLOCK}}
 USER $USERNAME
+
+{{CODEX_INSTALL_BLOCK}}
+# Install Claude Code
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
 WORKDIR /workspaces

@@ -42,25 +42,21 @@ setting-up-devcontainers/
 │   ├── devcontainer.json.template
 │   ├── Dockerfile.template
 │   ├── post-create.sh.template
-│   └── reinstall-marketplace.sh.template
+│   ├── reinstall-marketplace.sh.template
+│   └── sync-codex-skills.sh.template
 ├── references/           # Reference documentation
 │   ├── devcontainer-spec.md
-│   └── claude-code-installation.md
+│   ├── claude-code-installation.md
+│   └── codex-cli-installation.md
 └── tests/
     └── scenarios.md      # Self-evaluation test scenarios
 ```
 
 ## Templates
 
-The `templates/` directory contains template files with placeholders:
+The `templates/` directory contains template files with placeholders.
 
-| Placeholder | Description |
-|-------------|-------------|
-| `{{MARKETPLACE_NAME}}` | Name from marketplace.json |
-| `{{PROJECT_DIR}}` | Project directory name |
-| `{{ENABLED_PLUGINS}}` | JSON object entries for plugins |
-| `{{ALLOWED_SKILLS}}` | JSON array entries for skills |
-| `{{PLUGIN_INSTALL_COMMANDS}}` | Shell commands for plugin installation |
+See SKILL.md for the complete placeholder reference (12+ placeholders including `{{CODEX_*}}` for optional Codex CLI support).
 
 ## Testing
 
