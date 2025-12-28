@@ -96,7 +96,8 @@ Use the templates in `templates/` directory, substituting placeholders:
 | `{{ALLOWED_SKILLS}}` | Array entries like `"Skill(name)"` |
 | `{{PLUGIN_INSTALL_COMMANDS}}` | Plugin install commands (with `|| true`) |
 | `{{CODEX_VOLUME_MOUNT}}` | If Codex: `,\n    "source=codex-config-{{MARKETPLACE_NAME}},..."` else: empty |
-| `{{CODEX_INSTALL_BLOCK}}` | If Codex: Volta/Codex RUN command, else: comment |
+| `{{VOLTA_ENV_BLOCK}}` | If Codex: `ENV VOLTA_HOME=... ENV PATH=...` else: empty |
+| `{{CODEX_INSTALL_BLOCK}}` | If Codex: Volta/Codex RUN command, else: empty |
 | `{{CODEX_DIR_LIST}}` | If Codex: ` "$HOME/.codex"` else: empty |
 | `{{CODEX_ALIASES}}` | If Codex: Codex alias lines, else: empty |
 | `{{CODEX_SETUP_BLOCK}}` | If Codex: Codex setup in post-create.sh, else: empty |

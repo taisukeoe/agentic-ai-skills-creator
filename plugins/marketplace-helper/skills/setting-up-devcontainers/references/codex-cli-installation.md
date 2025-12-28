@@ -5,14 +5,15 @@ Quick reference for installing OpenAI Codex CLI in devcontainers.
 ## Installation via Volta
 
 ```dockerfile
-# In Dockerfile
+# In Dockerfile ({{VOLTA_ENV_BLOCK}} placeholder)
 ENV VOLTA_HOME="/home/vscode/.volta"
-ENV PATH="$VOLTA_HOME/bin:/home/vscode/.local/bin:$PATH"
+ENV PATH="$VOLTA_HOME/bin:$PATH"
 
 USER $USERNAME
 
+# {{CODEX_INSTALL_BLOCK}} placeholder
 RUN curl -fsSL https://get.volta.sh | bash \
-    && $VOLTA_HOME/bin/volta install node \
+    && $VOLTA_HOME/bin/volta install node@22.21 \
     && $VOLTA_HOME/bin/volta install @openai/codex
 ```
 

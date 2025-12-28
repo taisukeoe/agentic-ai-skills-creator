@@ -1,5 +1,17 @@
 # Test Scenarios for setting-up-devcontainers
 
+## Contents
+
+- [Generate devcontainer for simple marketplace](#scenario-generate-devcontainer-for-simple-marketplace) (Easy)
+- [Handle marketplace with multiple plugins](#scenario-handle-marketplace-with-multiple-plugins) (Medium)
+- [Handle missing marketplace.json](#scenario-handle-missing-marketplacejson) (Edge-case)
+- [Handle existing .devcontainer directory](#scenario-handle-existing-devcontainer-directory) (Edge-case)
+- [Marketplace with nested plugin directories](#scenario-marketplace-with-nested-plugin-directories) (Hard)
+- [Explain devcontainer architecture](#scenario-explain-devcontainer-architecture) (Easy)
+- [Generate devcontainer with Codex CLI support](#scenario-generate-devcontainer-with-codex-cli-support) (Medium)
+
+---
+
 ## Scenario: Generate devcontainer for simple marketplace
 
 **Difficulty:** Easy
@@ -45,11 +57,12 @@
      - Installs curl, git, jq, ca-certificates, sudo, zsh
      - Creates non-root vscode user with zsh as default shell
      - Handles existing UID/GID 1000 in base image (ubuntu user)
-     - Sets PATH for ~/.local/bin and VOLTA_HOME (for Codex if enabled)
+     - Sets PATH for ~/.local/bin (always)
+     - If Codex enabled: Adds VOLTA_HOME env and extends PATH with $VOLTA_HOME/bin
      - Configures passwordless sudo for vscode user
      - Installs Claude Code at build time
      - If Codex enabled: Installs Volta, Node.js, and Codex CLI via volta install
-   - **Haiku pitfall:** Installs Claude Code in Dockerfile, missing sudo/zsh, hardcodes user creation without checking existing UID, uses npm instead of volta for Codex
+   - **Haiku pitfall:** Missing sudo/zsh, hardcodes user creation without checking existing UID, uses npm instead of volta for Codex, sets VOLTA_HOME when Codex not enabled
    - **Weight:** 4
 
 5. Generates post-create.sh with correct structure
@@ -96,7 +109,8 @@
 - Pattern in Dockerfile: `-s /bin/zsh` in useradd/usermod command
 - Pattern in Dockerfile: `getent group` and `getent passwd` for UID/GID handling
 - Pattern in Dockerfile: `sudoers.d` for passwordless sudo
-- Pattern in Dockerfile: `VOLTA_HOME` and `PATH` environment variables
+- Pattern in Dockerfile: `PATH="/home/vscode/.local/bin:$PATH"` (always present)
+- Pattern in Dockerfile (if Codex): `VOLTA_HOME` and extended `PATH` with `$VOLTA_HOME/bin`
 - Pattern in Dockerfile (if Codex): `volta install node` and `volta install @openai/codex`
 - Pattern in post-create.sh: `export VOLTA_HOME` and `export PATH` with both paths
 - Pattern in post-create.sh: `sudo chown` for volume ownership (including ~/.codex)
@@ -390,7 +404,8 @@
    - **Weight:** 3
 
 **Output validation:**
-- Pattern in Dockerfile: `VOLTA_HOME="/home/vscode/.volta"`
+- Pattern in Dockerfile: `ENV VOLTA_HOME="/home/vscode/.volta"`
+- Pattern in Dockerfile: `PATH="$VOLTA_HOME/bin` (VOLTA_HOME in PATH)
 - Pattern in Dockerfile: `volta install node`
 - Pattern in Dockerfile: `volta install @openai/codex`
 - Pattern in devcontainer.json: `codex-config-`
