@@ -14,29 +14,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Claude Code plugin marketplace providing skills for creating and reviewing AI agent skills following Claude's official best practices.
 
-**Two plugins included:**
+**Three plugins included:**
 
 1. **skills-helper** - Skills for AI agent skill development
-   - `creating-effective-skills` - Guide for creating skills with 7-step workflow
+   - `creating-effective-skills` - Guide for creating skills with 9-step workflow
+   - `evaluating-skills-with-models` - Evaluate skills across sonnet, opus, haiku models
    - `improving-skills` - Improve existing skills based on user feedback
    - `reviewing-skills` - Review skills against best practices with compliance checks
 
 2. **marketplace-helper** - Skills for marketplace configuration
    - `reviewing-plugin-marketplace` - Review marketplace configurations, detect common errors
+   - `setting-up-devcontainers` - Generate devcontainer configurations for marketplaces
+
+3. **skills-helper-experimental** - Experimental skills for skill development
+   - `running-skills-edd-cycle` - Guide EDD (evaluation-driven development) process
 
 ## Architecture
 
 **Directory structure:**
 ```
+.devcontainer/               # Development container configuration
 plugins/
-  skills-helper/           # Plugin for skill development
+  skills-helper/             # Plugin for skill development
     skills/
       creating-effective-skills/
+      evaluating-skills-with-models/
       improving-skills/
       reviewing-skills/
-  marketplace-helper/      # Plugin for marketplace validation
+  marketplace-helper/        # Plugin for marketplace validation
     skills/
       reviewing-plugin-marketplace/
+      setting-up-devcontainers/
+  skills-helper-experimental/  # Experimental skills
+    skills/
+      running-skills-edd-cycle/
 .claude-plugin/marketplace.json
 ```
 

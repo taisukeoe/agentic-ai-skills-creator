@@ -1,6 +1,6 @@
 # Agentic AI Skills Creator
 
-A Claude Code plugin providing skills for creating and reviewing effective AI agent skills following Claude's official best practices.
+A Claude Code plugin marketplace providing skills for creating and reviewing effective AI agent skills following Claude's official best practices.
 
 ## Confidentiality Notice
 
@@ -8,83 +8,35 @@ A Claude Code plugin providing skills for creating and reviewing effective AI ag
 
 All examples, documentation, and code samples in this repository use generic, fictional names and scenarios. Any resemblance to actual company names, project names, or proprietary information is unintentional and should be reported immediately.
 
-**Guidelines:**
-- Use generic placeholder names (e.g., `example-plugin`, `my-marketplace`) in all documentation
-- Do not reference real internal projects, tools, or organizational structures
-- All skills and examples must be publicly shareable
-- Report any accidental inclusion of confidential information by opening an issue
+## Plugins & Skills
 
-## Skills Included
+### [skills-helper](plugins/skills-helper/)
 
-### 1. creating-effective-skills
+Skills for AI agent skill development.
 
-Guide for creating high-quality agent skills that follow Claude's official best practices.
+| Skill | Description |
+|-------|-------------|
+| `creating-effective-skills` | Guide for creating skills with 9-step workflow |
+| `evaluating-skills-with-models` | Evaluate skills across sonnet, opus, haiku models |
+| `improving-skills` | Improve existing skills based on user feedback |
+| `reviewing-skills` | Review skills against best practices with compliance checks |
 
-**Features:**
-- Naming conventions (gerund form)
-- Progressive disclosure patterns
-- Description writing guidelines
-- Degrees of freedom determination
-- File organization best practices
-- 8-step workflow for skill creation
+### [marketplace-helper](plugins/marketplace-helper/)
 
-**Use when:**
-- Designing new agent skills
-- Implementing skill architecture
-- Improving existing skills
-- Learning skill development best practices
+Skills for marketplace configuration.
 
-### 2. improving-skills
+| Skill | Description |
+|-------|-------------|
+| `reviewing-plugin-marketplace` | Review marketplace configurations, detect common errors |
+| `setting-up-devcontainers` | Generate devcontainer configurations for marketplaces |
 
-Improve existing agent skills based on user feedback and best practices.
+### [skills-helper-experimental](plugins/skills-helper-experimental/)
 
-**Features:**
-- User feedback gathering workflow
-- Technical analysis against best practices
-- Improvement plan presentation
-- Implementation with diff summary
+Experimental skills for skill development.
 
-**Use when:**
-- Fixing issues in existing skills
-- Enhancing skill functionality
-- Refactoring skill structure
-- Addressing user-reported problems
-
-### 3. reviewing-skills
-
-Comprehensive review of agent skills against Claude's official best practices.
-
-**Features:**
-- Compliance checks (naming, description, size, structure)
-- Progressive disclosure verification
-- Content quality assessment
-- Anti-pattern detection
-- Detailed feedback with priorities
-- Actionable improvement suggestions
-
-**Use when:**
-- Analyzing existing skills
-- Verifying compliance with best practices
-- Getting feedback before publishing
-- Quality assurance for skill development
-
-### 4. reviewing-plugin-marketplace
-
-Review Claude Code plugin marketplace configurations against official best practices.
-
-**Features:**
-- marketplace.json structure validation
-- Skills paths verification
-- Git remote URL consistency checks
-- README.md repository reference validation
-- Common error detection (plugin.json presence, path mismatches)
-- Automated verification script
-
-**Use when:**
-- Creating a new plugin marketplace
-- Verifying marketplace configuration
-- Debugging plugin installation issues
-- Ensuring compliance with Anthropic format
+| Skill | Description |
+|-------|-------------|
+| `running-skills-edd-cycle` | Guide EDD (evaluation-driven development) process |
 
 ## Installation
 
@@ -92,8 +44,9 @@ Review Claude Code plugin marketplace configurations against official best pract
 
 ```bash
 /plugin marketplace add taisukeoe/agentic-ai-skills-creator
-/plugin install skills-helper@agentic-ai-skills-creator
-/plugin install marketplace-helper@agentic-ai-skills-creator
+/plugin install skills-helper@agentic-skills-creator
+/plugin install marketplace-helper@agentic-skills-creator
+/plugin install skills-helper-experimental@agentic-skills-creator  # Optional
 ```
 
 ### From Local Path (Development)
@@ -106,91 +59,23 @@ Review Claude Code plugin marketplace configurations against official best pract
 
 After installation, restart Claude Code to activate the skills.
 
-## Usage
+## Quick Start
 
 ### Creating a New Skill
-
-Simply ask Claude to create a skill, and the `creating-effective-skills` skill will automatically guide the process:
 
 ```
 Create a skill for processing PDF files
 ```
 
-Claude will:
-1. Ask about functionality and triggers
-2. Determine appropriate freedom level
-3. Create proper file structure
-4. Write SKILL.md following best practices
-5. Create reference files as needed
-6. Update settings.json
+Claude will guide you through the 9-step workflow to create a properly structured skill.
 
 ### Reviewing an Existing Skill
-
-Ask Claude to review a skill:
 
 ```
 Review the skill at .claude/skills/my-skill/
 ```
 
-Claude will:
-1. Analyze SKILL.md and references
-2. Check compliance with best practices
-3. Provide detailed feedback with priorities
-4. Suggest specific improvements
-
-## Development
-
-### Project Structure
-
-```
-agentic-ai-skills-creator/
-├── .claude-plugin/
-│   └── marketplace.json      # Marketplace manifest
-├── .claude/
-│   └── settings.json         # Local development settings
-├── plugins/
-│   ├── skills-helper/        # Plugin for skill development
-│   │   ├── .claude-plugin/
-│   │   │   └── plugin.json
-│   │   └── skills/
-│   │       ├── creating-effective-skills/
-│   │       │   ├── SKILL.md
-│   │       │   └── references/
-│   │       ├── improving-skills/
-│   │       │   └── SKILL.md
-│   │       └── reviewing-skills/
-│   │           ├── SKILL.md
-│   │           └── references/
-│   └── marketplace-helper/   # Plugin for marketplace validation
-│       ├── .claude-plugin/
-│       │   └── plugin.json
-│       └── skills/
-│           └── reviewing-plugin-marketplace/
-│               ├── SKILL.md
-│               ├── scripts/
-│               └── references/
-├── LICENSE                   # Apache 2.0
-└── README.md
-```
-
-### Local Development Settings
-
-Configure permissions in `.claude/settings.json` for local development:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Skill(creating-effective-skills)",
-      "Skill(improving-skills)",
-      "Skill(reviewing-skills)",
-      "Skill(reviewing-plugin-marketplace)"
-    ]
-  }
-}
-```
-
-For users installing the plugin, skills are automatically available after plugin installation.
+Claude will analyze the skill and provide feedback with priorities.
 
 ## Best Practices Covered
 
@@ -205,24 +90,12 @@ For users installing the plugin, skills are automatically available after plugin
 
 Copyright 2025 Softgraphy GK
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit issues or pull requests.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ## Links
 
-- [Claude Code Documentation](https://code.claude.com/docs)
-- [Agent Skills Guide](https://code.claude.com/docs/en/skills.md)
-- [Plugin Development](https://code.claude.com/docs/en/plugins.md)
+- [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
