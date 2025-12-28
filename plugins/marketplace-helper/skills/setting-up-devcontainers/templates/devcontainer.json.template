@@ -1,0 +1,13 @@
+{
+  "name": "{{MARKETPLACE_NAME}}-devcontainer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "mounts": [
+    "source=claude-config-{{MARKETPLACE_NAME}},target=/home/vscode/.claude,type=volume",
+    "source=claude-data-{{MARKETPLACE_NAME}},target=/home/vscode/.local/share/claude,type=volume"
+  ],
+  "remoteUser": "vscode",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postStartCommand": "bash .devcontainer/reinstall-marketplace.sh"
+}

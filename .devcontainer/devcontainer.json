@@ -1,0 +1,13 @@
+{
+  "name": "agentic-skills-creator-devcontainer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "mounts": [
+    "source=claude-config-agentic-skills-creator,target=/home/vscode/.claude,type=volume",
+    "source=claude-data-agentic-skills-creator,target=/home/vscode/.local/share/claude,type=volume"
+  ],
+  "remoteUser": "vscode",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postStartCommand": "bash .devcontainer/reinstall-marketplace.sh"
+}

@@ -1,0 +1,210 @@
+---
+name: setting-up-devcontainers
+description: Generate devcontainer configurations for Claude Code plugin marketplaces. Use when setting up development containers, creating .devcontainer/ for a marketplace, or configuring isolated Claude Code environments with pre-registered plugins and skills.
+license: Apache-2.0
+metadata:
+  author: Softgraphy GK
+  version: "0.1.0"
+---
+
+# Setting Up Devcontainers for Claude Code Marketplaces
+
+Generate complete `.devcontainer/` configurations for Claude Code plugin marketplaces with:
+- Pre-installed Claude Code CLI
+- Auto-enabled plugins and skills
+- Persistent credentials via Docker volumes
+- Automatic marketplace synchronization
+
+## Quick Start
+
+```
+User: Set up a devcontainer for my marketplace
+Agent: I'll analyze your marketplace.json and generate the devcontainer configuration.
+```
+
+## Workflow
+
+### Step 1: Locate Marketplace Configuration
+
+Find and validate `.claude-plugin/marketplace.json`:
+
+```bash
+# Check for marketplace.json
+ls .claude-plugin/marketplace.json
+```
+
+If missing, ask user for correct path or offer to help create one.
+
+**Required fields to extract**:
+- `name` - Marketplace name (used for volume naming)
+- `plugins` - Array of plugin definitions
+
+### Step 2: Discover Plugins and Skills
+
+For each plugin in `marketplace.json`:
+
+1. Read `source` path (e.g., `"./plugins/plugin-name"`)
+2. Check for `.claude-plugin/plugin.json` in source directory
+3. Find `skills` path from plugin.json or use `./skills/` default
+4. List all SKILL.md files in skills directory
+5. Extract skill names from directory names
+
+**Build two lists**:
+- `enabledPlugins`: `{"plugin-name@marketplace-name": true, ...}`
+- `allowedSkills`: `["Skill(skill-1)", "Skill(skill-2)", ...]`
+
+### Step 3: Ask About Auto-Sync on Container Start
+
+**Ask the user explicitly**:
+
+> Do you want to automatically reinstall the marketplace on every container start?
+>
+> - **Yes**: Adds `postStartCommand` to run `reinstall-marketplace.sh` automatically
+> - **No** (recommended for stable development): Run manually when needed
+>
+> Note: This is a workaround for Claude Code not detecting local plugin changes.
+> Running on every start adds ~5-10 seconds delay.
+
+### Step 4: Generate Files from Templates
+
+Use the templates in `templates/` directory, substituting placeholders:
+
+| Placeholder | Value |
+|-------------|-------|
+| `{{MARKETPLACE_NAME}}` | Marketplace name from marketplace.json |
+| `{{PROJECT_DIR}}` | Project directory name |
+| `{{ENABLED_PLUGINS}}` | Object entries like `"plugin@market": true` |
+| `{{ALLOWED_SKILLS}}` | Array entries like `"Skill(name)"` |
+| `{{PLUGIN_INSTALL_COMMANDS}}` | Plugin install commands (with `|| true`) |
+
+**Templates**:
+- [devcontainer.json.template](templates/devcontainer.json.template) - Container configuration
+- [Dockerfile.template](templates/Dockerfile.template) - Ubuntu + dependencies
+- [post-create.sh.template](templates/post-create.sh.template) - Initial setup
+- [reinstall-marketplace.sh.template](templates/reinstall-marketplace.sh.template) - Marketplace sync
+
+**If user chose no auto-sync**: Remove `postStartCommand` from devcontainer.json.
+
+### Step 5: Write Files and Set Permissions
+
+1. Create `.devcontainer/` directory if not exists
+2. Write all generated files (without `.template` suffix)
+3. Make shell scripts executable: `chmod +x .devcontainer/*.sh`
+
+### Step 6: Provide Usage Instructions
+
+```
+Devcontainer files created in .devcontainer/
+
+To use:
+1. Open project in VS Code
+2. Click "Reopen in Container" when prompted
+   (or use Command Palette: "Dev Containers: Reopen in Container")
+3. Run 'claude' on first use to complete initial setup
+
+Your credentials persist in Docker volumes.
+
+To manually sync marketplace changes:
+  bash .devcontainer/reinstall-marketplace.sh
+```
+
+## Generated File Locations
+
+```
+.devcontainer/
+├── devcontainer.json      # Container configuration
+├── Dockerfile             # Ubuntu + dependencies
+├── post-create.sh         # Initial setup (Claude install, config)
+└── reinstall-marketplace.sh  # Marketplace sync script
+```
+
+## Key Configuration Details
+
+### Volume Strategy
+
+Uses two named Docker volumes plus a symlink for complete persistence:
+
+```
+Volume 1: claude-config-${MARKETPLACE_NAME} → ~/.claude/
+├── .home-claude.json        # Setup state (symlink target)
+├── .credentials.json        # Auth tokens
+├── settings.json            # User settings
+└── plugins/                 # Plugin data
+
+Volume 2: claude-data-${MARKETPLACE_NAME} → ~/.local/share/claude/
+└── versions/
+    └── X.X.X                # Claude Code binary
+
+Symlink (created by post-create.sh):
+~/.claude.json → ~/.claude/.home-claude.json
+```
+
+**Why three persistence mechanisms?**
+
+| Location | Purpose | Persistence Method |
+|----------|---------|-------------------|
+| `~/.claude/` | Config, credentials, settings | Volume mount |
+| `~/.local/share/claude/` | Binary (216MB) | Volume mount |
+| `~/.claude.json` | Initial setup state | Symlink to volume |
+
+**Important**: `~/.claude.json` cannot be directly mounted as a volume (Docker creates a directory instead of a file). The symlink approach allows the file to persist inside the `~/.claude/` volume.
+
+### Shell Alias
+
+The setup creates a persistent alias file in the volume:
+
+- `post-create.sh` creates `~/.claude/.shell-aliases` (persists in volume)
+- `reinstall-marketplace.sh` adds `source` line to `.zshrc` on every start
+
+```bash
+# ~/.claude/.shell-aliases (persisted)
+alias claude-y='claude --dangerously-skip-permissions'
+```
+
+This survives container rebuilds because the alias file is stored in the volume.
+
+### Plugin Format
+
+**enabledPlugins** must be object format (not array):
+
+```json
+{
+  "enabledPlugins": {
+    "plugin-a@marketplace": true,
+    "plugin-b@marketplace": true
+  }
+}
+```
+
+### Marketplace Sync (Workaround)
+
+`reinstall-marketplace.sh` is a **workaround** for Claude Code not automatically detecting local plugin/skill changes.
+
+**What it does**:
+- Removes and re-adds the marketplace
+- Reinstalls all enabled plugins
+
+**When to run**:
+- Manually after editing SKILL.md files: `bash .devcontainer/reinstall-marketplace.sh`
+- Or automatically via `postStartCommand` (if user opted in)
+
+## Error Handling
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| marketplace.json not found | Wrong path | Ask user for correct marketplace path |
+| No plugins found | Empty plugins array | Warn user, generate minimal config |
+| Source path invalid | Plugin source doesn't exist | Report error, skip invalid plugins |
+| Existing .devcontainer/ | Files already present | Ask before overwriting |
+| GID/UID 1000 already exists | Ubuntu base image has existing user | Use `getent` to detect and rename existing user |
+| Permission denied on config | Volume owned by root | Use `sudo chown` in post-create.sh |
+| claude: command not found | PATH not set | Export `PATH="$HOME/.local/bin:$PATH"` in scripts |
+| EISDIR on ~/.claude.json | Volume mounted as directory | Remove directory, use symlink instead |
+| JSON Parse error: Unexpected EOF | Empty ~/.claude.json file | Initialize with `{}` not empty file |
+| Raw mode not supported | Plugin commands in non-interactive shell | Only run plugin commands if setup complete |
+| Login required after rebuild | ~/.claude.json not persisted | Symlink to file inside volume |
+
+## References
+
+- [Devcontainer Specification](references/devcontainer-spec.md)
+- [Claude Code Installation](references/claude-code-installation.md)
