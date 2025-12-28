@@ -36,9 +36,9 @@ ENV PATH="$VOLTA_HOME/bin:/home/vscode/.local/bin:$PATH"
 
 USER $USERNAME
 
-# Install Volta, Node.js, and Codex CLI
+# Install Volta, Node.js (LTS), and Codex CLI
 RUN curl https://get.volta.sh | bash \
-    && $VOLTA_HOME/bin/volta install node \
+    && $VOLTA_HOME/bin/volta install node@22.21 \
     && $VOLTA_HOME/bin/volta install @openai/codex
 
 # Install Claude Code
