@@ -33,8 +33,7 @@
 3. Generates valid devcontainer.json
    - **Minimum:** Creates syntactically valid JSON
    - **Quality criteria:**
-     - Uses named volume for /opt/claude-config (NOT host mount)
-     - Sets CLAUDE_CONFIG_DIR environment variable
+     - Uses named volumes for ~/.claude and ~/.local/share/claude (NOT host mount)
      - Includes both postCreateCommand and postStartCommand
      - Volume name includes marketplace name for uniqueness
    - **Haiku pitfall:** Uses host mount for ~/.claude, forgets postStartCommand
@@ -46,7 +45,7 @@
      - Installs curl, git, jq, ca-certificates, sudo, zsh
      - Creates non-root vscode user with zsh as default shell
      - Handles existing UID/GID 1000 in base image (ubuntu user)
-     - Sets CLAUDE_CONFIG_DIR env and PATH for ~/.local/bin
+     - Sets PATH for ~/.local/bin (Claude Code default install location)
      - Configures passwordless sudo for vscode user
      - Does NOT install Claude Code (deferred to post-create.sh)
    - **Haiku pitfall:** Installs Claude Code in Dockerfile, missing sudo/zsh, hardcodes user creation without checking existing UID
@@ -69,7 +68,7 @@
    - **Quality criteria:**
      - Exports PATH with $HOME/.local/bin at the beginning
      - Handles --quiet flag
-     - Uses CLAUDE_CONFIG_DIR or fallback to $HOME/.claude
+     - Uses $HOME/.claude for config directory
      - Properly quotes paths and handles edge cases
    - **Haiku pitfall:** Hardcodes paths, missing PATH export, missing error handling
    - **Weight:** 3
@@ -258,13 +257,13 @@
 
 **Expected behaviors:**
 
-1. Explains CLAUDE_CONFIG_DIR strategy
-   - **Minimum:** Mentions the environment variable
+1. Explains named volume strategy
+   - **Minimum:** Mentions named volumes for persistence
    - **Quality criteria:**
-     - Explains why /opt/claude-config instead of ~/.claude
+     - Explains using named volumes for ~/.claude and ~/.local/share/claude
      - Describes what's stored (credentials, settings, plugins config)
      - Notes Claude binary is installed to ~/.local/bin (not in volume)
-     - Explains volume persistence benefits
+     - Explains volume persistence benefits across container rebuilds
    - **Haiku pitfall:** Vague explanation, confuses binary location with config, doesn't mention volume persistence
    - **Weight:** 4
 
@@ -287,4 +286,4 @@
    - **Weight:** 3
 
 **Output validation:**
-- Response mentions: CLAUDE_CONFIG_DIR, named volume, postCreateCommand, postStartCommand
+- Response mentions: named volume, ~/.claude, postCreateCommand, postStartCommand
