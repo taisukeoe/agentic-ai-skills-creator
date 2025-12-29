@@ -10,7 +10,7 @@ metadata:
 # Setting Up Devcontainers for Claude Code
 
 Generate complete `.devcontainer/` configurations for Claude Code development environments with:
-- Pre-installed Claude Code and Codex CLI (built into Docker image)
+- Pre-installed Claude Code (+ optional Codex CLI built into Docker image)
 - Persistent credentials and config via Docker volumes
 - **Marketplace mode** (if marketplace.json exists): Auto-enabled plugins and skills
 
@@ -33,7 +33,7 @@ ls .claude-plugin/marketplace.json
 
 **Mode determination**:
 - **Marketplace mode**: If `marketplace.json` exists → full plugin/skill setup
-- **Generic mode**: If not found → Claude Code + Codex environment only
+- **Generic mode**: If not found → Claude Code environment (+ optional Codex CLI)
 
 For **Marketplace mode**, extract:
 - `name` - Marketplace name (used for volume naming)
@@ -114,10 +114,10 @@ Use the templates in `templates/` directory, substituting placeholders:
 | `{{ENABLED_PLUGINS}}` | Object entries like `"plugin@market": true` |
 | `{{ALLOWED_SKILLS}}` | Array entries like `"Skill(name)"` |
 | `{{PLUGIN_INSTALL_COMMANDS}}` | Plugin install commands (with `|| true`) |
-| `{{CODEX_SETUP_BLOCK}}` | If Codex: Codex setup in post-create.sh, else: empty |
+| `{{CODEX_SETUP_BLOCK}}` | If Codex **and** Marketplace mode: Codex skill sync in post-create.sh, else: empty |
 | `{{CODEX_SYNC_BLOCK}}` | If Codex: Codex sync in reinstall-marketplace.sh, else: empty |
 | `{{POST_START_COMMAND}}` | If auto-sync: `,\n  "postStartCommand": "bash .devcontainer/reinstall-marketplace.sh"` else: empty |
-| `{{SETTINGS_BLOCK}}` | Full settings.json content with enabledPlugins/allowedSkills |
+| `{{SETTINGS_BLOCK}}` | Shell commands to create settings.json with enabledPlugins/allowedSkills |
 | `{{MARKETPLACE_REGISTER_BLOCK}}` | Marketplace registration and plugin install commands |
 | `{{MARKETPLACE_SYNC_HINT}}` | `echo "To sync marketplace: bash .devcontainer/reinstall-marketplace.sh"` |
 
@@ -126,7 +126,7 @@ Use the templates in `templates/` directory, substituting placeholders:
 | Placeholder | Value |
 |-------------|-------|
 | `{{POST_START_COMMAND}}` | empty (no postStartCommand) |
-| `{{SETTINGS_BLOCK}}` | Minimal settings: `{}` |
+| `{{SETTINGS_BLOCK}}` | empty (no plugin settings needed) |
 | `{{MARKETPLACE_REGISTER_BLOCK}}` | empty (no marketplace registration) |
 | `{{CODEX_SETUP_BLOCK}}` | empty (no skill sync needed) |
 | `{{MARKETPLACE_SYNC_HINT}}` | empty |
@@ -247,8 +247,8 @@ Symlink (created by post-create.sh):
 The setup creates a persistent alias file in the volume:
 
 - `post-create.sh` creates `~/.claude/.shell-aliases` (persists in volume)
-- `reinstall-marketplace.sh` adds `source` line to `.zshrc` on every start (Marketplace mode)
-- `post-create.sh` adds `source` line to `.zshrc` (Generic mode)
+- `post-create.sh` adds `source` line to `.zshrc` (both modes, with duplicate protection)
+- `reinstall-marketplace.sh` also adds `source` line to `.zshrc` on every start (Marketplace mode only)
 
 ```bash
 # ~/.claude/.shell-aliases (persisted)
