@@ -1,45 +1,67 @@
 ---
 name: setting-up-devcontainers
-description: Generate devcontainer configurations for Claude Code plugin marketplaces. Use when setting up development containers, creating .devcontainer/ for a marketplace, or configuring isolated Claude Code environments with pre-registered plugins and skills.
+description: Generate devcontainer configurations for Claude Code development environments. Use when setting up development containers with Claude Code and optional Codex CLI. Automatically detects marketplace.json for plugin marketplace configurations.
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
-# Setting Up Devcontainers for Claude Code Marketplaces
+# Setting Up Devcontainers for Claude Code
 
-Generate complete `.devcontainer/` configurations for Claude Code plugin marketplaces with:
+Generate complete `.devcontainer/` configurations for Claude Code development environments with:
 - Pre-installed Claude Code and Codex CLI (built into Docker image)
-- Auto-enabled plugins and skills
 - Persistent credentials and config via Docker volumes
-- Automatic marketplace synchronization
+- **Marketplace mode** (if marketplace.json exists): Auto-enabled plugins and skills
 
 ## Quick Start
 
 ```
-User: Set up a devcontainer for my marketplace
-Agent: I'll analyze your marketplace.json and generate the devcontainer configuration.
+User: Set up a devcontainer for this project
+Agent: I'll check for marketplace.json and generate the devcontainer configuration.
 ```
 
 ## Workflow
 
-### Step 1: Locate Marketplace Configuration
+### Step 1: Detect Mode
 
-Find and validate `.claude-plugin/marketplace.json`:
+Check for `.claude-plugin/marketplace.json`:
 
 ```bash
-# Check for marketplace.json
 ls .claude-plugin/marketplace.json
 ```
 
-If missing, ask user for correct path or offer to help create one.
+**Mode determination**:
+- **Marketplace mode**: If `marketplace.json` exists → full plugin/skill setup
+- **Generic mode**: If not found → Claude Code + Codex environment only
 
-**Required fields to extract**:
+For **Marketplace mode**, extract:
 - `name` - Marketplace name (used for volume naming)
 - `plugins` - Array of plugin definitions
 
-### Step 2: Discover Plugins and Skills
+For **Generic mode**, use:
+- Project directory name for volume naming
+
+### Step 2: Ask About Codex CLI Support (Optional)
+
+**Ask the user explicitly**:
+
+> Do you want to add Codex CLI (OpenAI) support alongside Claude Code?
+>
+> - **Yes**: Adds Volta, Node.js, Codex CLI, and skill sync mechanism
+> - **No** (default): Claude Code only
+
+If yes:
+- Add Volta/Node.js/Codex CLI installation to Dockerfile (installed at build time)
+- Add `~/.codex/` volume mount for config persistence
+- Add `sync-codex-skills.sh` script (copies skills to `~/.codex/skills/`) [Marketplace mode only]
+- Add Codex sync call to `post-create.sh` [Marketplace mode only]
+
+**Note**: Both Claude Code and Codex CLI are installed at Docker build time for faster container startup.
+
+### Step 3: Discover Plugins and Skills [Marketplace Mode Only]
+
+Skip this step in Generic mode.
 
 For each plugin in `marketplace.json`:
 
@@ -53,26 +75,9 @@ For each plugin in `marketplace.json`:
 - `enabledPlugins`: `{"plugin-name@marketplace-name": true, ...}`
 - `allowedSkills`: `["Skill(skill-1)", "Skill(skill-2)", ...]`
 
-### Step 3: Ask About Codex CLI Support (Optional)
+### Step 4: Ask About Auto-Sync on Container Start [Marketplace Mode Only]
 
-**Ask the user explicitly**:
-
-> Do you want to add Codex CLI (OpenAI) support alongside Claude Code?
->
-> - **Yes**: Adds Volta, Node.js, Codex CLI, and skill sync mechanism
-> - **No** (default): Claude Code only
-
-If yes:
-- Add Volta/Node.js/Codex CLI installation to Dockerfile (installed at build time)
-- Add `~/.codex/` volume mount for config persistence
-- Add `sync-codex-skills.sh` script (copies skills to `~/.codex/skills/`)
-- Add Codex sync call to `post-create.sh`
-
-**Note**: Both Claude Code and Codex CLI are installed at Docker build time for faster container startup.
-
-**Note**: Codex ignores symlinked directories, so skills must be copied (not linked).
-
-### Step 4: Ask About Auto-Sync on Container Start
+Skip this step in Generic mode.
 
 **Ask the user explicitly**:
 
@@ -88,33 +93,55 @@ If yes:
 
 Use the templates in `templates/` directory, substituting placeholders:
 
+#### Common Placeholders
+
 | Placeholder | Value |
 |-------------|-------|
-| `{{MARKETPLACE_NAME}}` | Marketplace name from marketplace.json |
+| `{{PROJECT_NAME}}` | Marketplace name (if exists) or project directory name |
 | `{{PROJECT_DIR}}` | Project directory name |
-| `{{ENABLED_PLUGINS}}` | Object entries like `"plugin@market": true` |
-| `{{ALLOWED_SKILLS}}` | Array entries like `"Skill(name)"` |
-| `{{PLUGIN_INSTALL_COMMANDS}}` | Plugin install commands (with `|| true`) |
-| `{{CODEX_VOLUME_MOUNT}}` | If Codex: `,\n    "source=codex-config-{{MARKETPLACE_NAME}},..."` else: empty |
+| `{{CODEX_VOLUME_MOUNT}}` | If Codex: `,\n    "source=codex-config-{{PROJECT_NAME}},..."` else: empty |
 | `{{VOLTA_ENV_BLOCK}}` | If Codex: `ENV VOLTA_HOME=... ENV PATH=...` else: empty |
 | `{{CODEX_INSTALL_BLOCK}}` | If Codex: Volta/Codex RUN command, else: empty |
 | `{{CODEX_DIR_LIST}}` | If Codex: ` "$HOME/.codex"` else: empty |
 | `{{CODEX_ALIASES}}` | If Codex: Codex alias lines, else: empty |
-| `{{CODEX_SETUP_BLOCK}}` | If Codex: Codex setup in post-create.sh, else: empty |
 | `{{CODEX_ALIAS_ECHO}}` | If Codex: `echo "  codex-f   - codex --full-auto"` else: empty |
-| `{{CODEX_SYNC_BLOCK}}` | If Codex: Codex sync in reinstall-marketplace.sh, else: empty |
 | `{{DEVCONTAINER_READY_MESSAGE}}` | "Claude Code devcontainer ready!" or "Claude Code + Codex CLI devcontainer ready!" |
+
+#### Marketplace Mode Placeholders
+
+| Placeholder | Value |
+|-------------|-------|
+| `{{ENABLED_PLUGINS}}` | Object entries like `"plugin@market": true` |
+| `{{ALLOWED_SKILLS}}` | Array entries like `"Skill(name)"` |
+| `{{PLUGIN_INSTALL_COMMANDS}}` | Plugin install commands (with `|| true`) |
+| `{{CODEX_SETUP_BLOCK}}` | If Codex: Codex setup in post-create.sh, else: empty |
+| `{{CODEX_SYNC_BLOCK}}` | If Codex: Codex sync in reinstall-marketplace.sh, else: empty |
+| `{{POST_START_COMMAND}}` | If auto-sync: `,\n  "postStartCommand": "bash .devcontainer/reinstall-marketplace.sh"` else: empty |
+| `{{SETTINGS_BLOCK}}` | Full settings.json content with enabledPlugins/allowedSkills |
+| `{{MARKETPLACE_REGISTER_BLOCK}}` | Marketplace registration and plugin install commands |
+| `{{MARKETPLACE_SYNC_HINT}}` | `echo "To sync marketplace: bash .devcontainer/reinstall-marketplace.sh"` |
+
+#### Generic Mode Placeholders
+
+| Placeholder | Value |
+|-------------|-------|
+| `{{POST_START_COMMAND}}` | empty (no postStartCommand) |
+| `{{SETTINGS_BLOCK}}` | Minimal settings: `{}` |
+| `{{MARKETPLACE_REGISTER_BLOCK}}` | empty (no marketplace registration) |
+| `{{CODEX_SETUP_BLOCK}}` | empty (no skill sync needed) |
+| `{{MARKETPLACE_SYNC_HINT}}` | empty |
 
 **Templates**:
 - [devcontainer.json.template](templates/devcontainer.json.template) - Container configuration
 - [Dockerfile.template](templates/Dockerfile.template) - Ubuntu + dependencies
 - [post-create.sh.template](templates/post-create.sh.template) - Initial setup
-- [reinstall-marketplace.sh.template](templates/reinstall-marketplace.sh.template) - Marketplace sync
-- [sync-codex-skills.sh.template](templates/sync-codex-skills.sh.template) - Codex skill sync (if Codex enabled)
+- [reinstall-marketplace.sh.template](templates/reinstall-marketplace.sh.template) - Marketplace sync (Marketplace mode only)
+- [sync-codex-skills.sh.template](templates/sync-codex-skills.sh.template) - Codex skill sync (Marketplace mode + Codex only)
 
 **Conditional logic**:
+- **Generic mode**: Omit reinstall-marketplace.sh and sync-codex-skills.sh
 - **If user chose no auto-sync**: Remove `postStartCommand` from devcontainer.json
-- **If user chose no Codex**: Omit Volta/Codex sections and sync-codex-skills.sh
+- **If user chose no Codex**: Omit Volta/Codex sections
 
 ### Step 6: Write Files and Set Permissions
 
@@ -124,6 +151,20 @@ Use the templates in `templates/` directory, substituting placeholders:
 
 ### Step 7: Provide Usage Instructions
 
+**Generic mode**:
+```
+Devcontainer files created in .devcontainer/
+
+To use:
+1. Open project in VS Code
+2. Click "Reopen in Container" when prompted
+   (or use Command Palette: "Dev Containers: Reopen in Container")
+3. Run 'claude' on first use to complete initial setup
+
+Your credentials persist in Docker volumes.
+```
+
+**Marketplace mode**:
 ```
 Devcontainer files created in .devcontainer/
 
@@ -141,6 +182,15 @@ To manually sync marketplace changes:
 
 ## Generated File Locations
 
+**Generic mode**:
+```
+.devcontainer/
+├── devcontainer.json         # Container configuration
+├── Dockerfile                # Ubuntu + Claude Code (+ Volta/Codex if enabled)
+└── post-create.sh            # Initial setup (config, aliases)
+```
+
+**Marketplace mode**:
 ```
 .devcontainer/
 ├── devcontainer.json         # Container configuration
@@ -161,19 +211,19 @@ Docker Image (built once):
 ├── ~/.local/bin/claude      # Claude Code binary
 └── ~/.volta/                # Volta + Node.js + Codex CLI (if enabled)
 
-Volume 1: claude-config-${MARKETPLACE_NAME} → ~/.claude/
+Volume 1: claude-config-${PROJECT_NAME} → ~/.claude/
 ├── .home-claude.json        # Setup state (symlink target)
 ├── .credentials.json        # Auth tokens
 ├── settings.json            # User settings
-└── plugins/                 # Plugin data
+└── plugins/                 # Plugin data (Marketplace mode)
 
-Volume 2: claude-data-${MARKETPLACE_NAME} → ~/.local/share/claude/
+Volume 2: claude-data-${PROJECT_NAME} → ~/.local/share/claude/
 └── (Claude Code data)       # Session data, etc.
 
-Volume 3 (if Codex enabled): codex-config-${MARKETPLACE_NAME} → ~/.codex/
+Volume 3 (if Codex enabled): codex-config-${PROJECT_NAME} → ~/.codex/
 ├── config.toml              # Codex CLI configuration
 ├── sessions/                # Session data
-└── skills/                  # Synced skills from marketplace
+└── skills/                  # Synced skills from marketplace (Marketplace mode)
 
 Symlink (created by post-create.sh):
 ~/.claude.json → ~/.claude/.home-claude.json
@@ -197,7 +247,8 @@ Symlink (created by post-create.sh):
 The setup creates a persistent alias file in the volume:
 
 - `post-create.sh` creates `~/.claude/.shell-aliases` (persists in volume)
-- `reinstall-marketplace.sh` adds `source` line to `.zshrc` on every start
+- `reinstall-marketplace.sh` adds `source` line to `.zshrc` on every start (Marketplace mode)
+- `post-create.sh` adds `source` line to `.zshrc` (Generic mode)
 
 ```bash
 # ~/.claude/.shell-aliases (persisted)
@@ -209,7 +260,7 @@ alias codex-f='codex --full-auto'
 
 This survives container rebuilds because the alias file is stored in the volume.
 
-### Plugin Format
+### Plugin Format [Marketplace Mode Only]
 
 **enabledPlugins** must be object format (not array):
 
@@ -222,7 +273,7 @@ This survives container rebuilds because the alias file is stored in the volume.
 }
 ```
 
-### Marketplace Sync (Workaround)
+### Marketplace Sync (Workaround) [Marketplace Mode Only]
 
 `reinstall-marketplace.sh` is a **workaround** for Claude Code not automatically detecting local plugin/skill changes.
 
@@ -238,7 +289,6 @@ This survives container rebuilds because the alias file is stored in the volume.
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| marketplace.json not found | Wrong path | Ask user for correct marketplace path |
 | No plugins found | Empty plugins array | Warn user, generate minimal config |
 | Source path invalid | Plugin source doesn't exist | Report error, skip invalid plugins |
 | Existing .devcontainer/ | Files already present | Ask before overwriting |

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Post-create script for Claude Code devcontainer
-# Generated for: {{MARKETPLACE_NAME}}
+# Generated for: {{PROJECT_NAME}}
 set -e
 
 CONFIG_DIR="$HOME/.claude"
@@ -49,38 +49,17 @@ ALIASES_EOF
     echo "Shell aliases created: $ALIASES_FILE"
 fi
 
-# Generate settings.json with enabled plugins and permissions (only if not exists)
-mkdir -p "$CONFIG_DIR"
-if [ ! -f "$CONFIG_DIR/settings.json" ]; then
-cat > "$CONFIG_DIR/settings.json" << 'SETTINGS_EOF'
-{
-  "enabledPlugins": {
-{{ENABLED_PLUGINS}}
-  },
-  "permissions": {
-    "allow": [
-{{ALLOWED_SKILLS}}
-    ]
-  }
-}
-SETTINGS_EOF
-  echo "Settings configured."
-else
-  echo "Settings already exist, skipping."
+# Ensure shell aliases are sourced in .zshrc
+if [ -f "$ALIASES_FILE" ] && ! grep -q "source.*\.shell-aliases" "$HOME/.zshrc" 2>/dev/null; then
+    echo "" >> "$HOME/.zshrc"
+    echo "# Source Claude Code aliases from volume" >> "$HOME/.zshrc"
+    echo "source \"$ALIASES_FILE\" 2>/dev/null || true" >> "$HOME/.zshrc"
+    echo "Shell aliases configured in .zshrc"
 fi
 
-# Register marketplace and install plugins (only if Claude is already set up)
-# Skip if not set up yet - user needs to run 'claude' first to complete setup
-if [ -s "$CLAUDE_JSON_IN_VOLUME" ] && [ "$(cat "$CLAUDE_JSON_IN_VOLUME")" != "{}" ]; then
-    echo "Registering marketplace..."
-    claude plugin marketplace add "$WORKSPACE" || true
+{{SETTINGS_BLOCK}}
 
-    echo "Installing plugins..."
-{{PLUGIN_INSTALL_COMMANDS}}
-else
-    echo "Claude not yet set up. Run 'claude' to complete setup, then run:"
-    echo "  bash .devcontainer/reinstall-marketplace.sh"
-fi
+{{MARKETPLACE_REGISTER_BLOCK}}
 
 {{CODEX_SETUP_BLOCK}}
 
@@ -94,4 +73,5 @@ echo ""
 echo "Aliases available (after shell restart):"
 echo "  claude-y  - claude --dangerously-skip-permissions"
 {{CODEX_ALIAS_ECHO}}
+{{MARKETPLACE_SYNC_HINT}}
 echo "======================================"
