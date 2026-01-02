@@ -1,12 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Release version (e.g., 1.0.0)'
-        required: true
-        type: string
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
@@ -15,13 +12,6 @@ jobs:
   release:
     runs-on: ubuntu-slim
     steps:
-      - name: Validate version format
-        run: |
-          if ! echo "${{ inputs.version }}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "Error: Version must follow semver format (e.g., 1.0.0)"
-            exit 1
-          fi
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -51,23 +41,11 @@ jobs:
             exit 1
           fi
 
-      - name: Create git tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          if git ls-remote --exit-code --tags origin "refs/tags/v${{ inputs.version }}" > /dev/null 2>&1; then
-            echo "Tag v${{ inputs.version }} already exists on origin. Skipping tag creation and push."
-          else
-            git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
-            git push origin "v${{ inputs.version }}"
-          fi
-
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "v${{ inputs.version }}" \
-            --title "v${{ inputs.version }}" \
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
             --generate-notes \
             dist/*.zip
