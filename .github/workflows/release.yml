@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create zip files for each skill
+        run: |
+          mkdir -p dist
+          for skill_dir in plugins/*/skills/*/; do
+            if [ -f "${skill_dir}SKILL.md" ]; then
+              # Extract plugin name and skill name from path
+              # plugins/skills-helper/skills/creating-effective-skills/ -> skills-helper, creating-effective-skills
+              plugin_name=$(echo "$skill_dir" | cut -d'/' -f2)
+              skill_name=$(echo "$skill_dir" | cut -d'/' -f4)
+              zip_name="${plugin_name}--${skill_name}.zip"
+
+              echo "Creating $zip_name from $skill_dir"
+              (cd "$skill_dir" && zip -r "$GITHUB_WORKSPACE/dist/$zip_name" .)
+            fi
+          done
+
+          echo "Created zip files:"
+          ls -la dist/
+
+      - name: Validate zip files exist
+        run: |
+          if ! compgen -G "dist/*.zip" > /dev/null; then
+            echo "Error: No skill packages found in dist/. Aborting release creation."
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            dist/*.zip
