@@ -15,6 +15,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate version format
+        run: |
+          if ! echo "${{ inputs.version }}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Error: Version must follow semver format (e.g., 1.0.0)"
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -30,19 +37,31 @@ jobs:
               zip_name="${plugin_name}--${skill_name}.zip"
 
               echo "Creating $zip_name from $skill_dir"
-              (cd "$skill_dir" && zip -r "../../../dist/$zip_name" .)
+              (cd "$skill_dir" && zip -r "$GITHUB_WORKSPACE/dist/$zip_name" .)
             fi
           done
 
           echo "Created zip files:"
           ls -la dist/
 
+      - name: Validate zip files exist
+        run: |
+          if ! compgen -G "dist/*.zip" > /dev/null; then
+            echo "Error: No skill packages found in dist/. Aborting release creation."
+            exit 1
+          fi
+
       - name: Create git tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
-          git push origin "v${{ inputs.version }}"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v${{ inputs.version }}" > /dev/null 2>&1; then
+            echo "Tag v${{ inputs.version }} already exists on origin. Skipping tag creation and push."
+          else
+            git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
+            git push origin "v${{ inputs.version }}"
+          fi
 
       - name: Create GitHub Release
         env:
