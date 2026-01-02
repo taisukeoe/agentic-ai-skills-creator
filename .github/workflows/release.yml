@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create zip files for each skill
+        run: |
+          mkdir -p dist
+          for skill_dir in plugins/*/skills/*/; do
+            if [ -f "${skill_dir}SKILL.md" ]; then
+              # Extract plugin name and skill name from path
+              # plugins/skills-helper/skills/creating-effective-skills/ -> skills-helper, creating-effective-skills
+              plugin_name=$(echo "$skill_dir" | cut -d'/' -f2)
+              skill_name=$(echo "$skill_dir" | cut -d'/' -f4)
+              zip_name="${plugin_name}--${skill_name}.zip"
+
+              echo "Creating $zip_name from $skill_dir"
+              (cd "$skill_dir" && zip -r "../../../dist/$zip_name" .)
+            fi
+          done
+
+          echo "Created zip files:"
+          ls -la dist/
+
+      - name: Create git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
+          git push origin "v${{ inputs.version }}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${{ inputs.version }}" \
+            --title "v${{ inputs.version }}" \
+            --generate-notes \
+            dist/*.zip
