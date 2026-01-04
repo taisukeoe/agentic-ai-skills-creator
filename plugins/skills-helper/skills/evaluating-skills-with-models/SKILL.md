@@ -153,19 +153,19 @@ This creates a historical record of how the skill performs across models and imp
 
 ### Scores by Behavior
 
-| Behavior | Weight | Haiku | Sonnet | Opus |
-|----------|--------|-------|--------|------|
+| Behavior | Weight | claude-haiku-4-5-20250101 | claude-sonnet-4-5-20250929 | claude-opus-4-5-20251101 |
+|----------|--------|---------------------------|----------------------------|--------------------------|
 | Asks clarifying questions | 4 | 25 | 75 | 100 |
 | Determines freedom level | 3 | 50 | 75 | 100 |
 | Creates proper SKILL.md | 5 | 50 | 100 | 100 |
 
 ### Total Scores
 
-| Model | Full Model ID | Score | Rating |
-|-------|---------------|-------|--------|
-| haiku | claude-haiku-4-5-20250101 | 42 | ⚠️ Marginal |
-| sonnet | claude-sonnet-4-5-20250929 | 85 | ✅ Good |
-| opus | claude-opus-4-5-20251101 | 100 | ✅ Excellent |
+| Model | Score | Rating |
+|-------|-------|--------|
+| claude-haiku-4-5-20250101 | 42 | ⚠️ Marginal |
+| claude-sonnet-4-5-20250929 | 85 | ✅ Good |
+| claude-opus-4-5-20251101 | 100 | ✅ Excellent |
 
 ### Observations
 - Haiku: Skipped justification for freedom level (pitfall)

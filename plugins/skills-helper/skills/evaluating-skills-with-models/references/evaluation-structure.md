@@ -273,8 +273,8 @@ Create at least 4 scenarios:
 Use detailed scoring matrix during evaluation:
 
 ```markdown
-| Scenario | Difficulty | Haiku | Sonnet | Opus |
-|----------|------------|-------|--------|------|
+| Scenario | Difficulty | claude-haiku-4-5-20250101 | claude-sonnet-4-5-20250929 | claude-opus-4-5-20251101 |
+|----------|------------|---------------------------|----------------------------|--------------------------|
 | Happy path | Easy | 85 | 92 | 95 |
 | Standard workflow | Medium | 62 | 88 | 94 |
 | Complex judgment | Hard | 41 | 75 | 91 |
