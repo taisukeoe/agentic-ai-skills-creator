@@ -58,6 +58,8 @@ Both pass, but quality differs dramatically.
 - Hard scenarios should show model differentiation
 - Edge-cases reveal robustness differences
 
+**Default to Hard scenarios:** When evaluating skills, prioritize Hard or Medium difficulty scenarios. Easy scenarios often fail to show meaningful differences between models and aren't representative of realistic production usage.
+
 ## Quality Criteria Examples
 
 ### For "Asks clarifying questions"
@@ -266,7 +268,9 @@ Create at least 4 scenarios:
 
 ## Tracking Results
 
-Use detailed scoring matrix:
+### Evaluation Summary Matrix
+
+Use detailed scoring matrix during evaluation:
 
 ```markdown
 | Scenario | Difficulty | Haiku | Sonnet | Opus |
@@ -276,6 +280,28 @@ Use detailed scoring matrix:
 | Complex judgment | Hard | 41 | 75 | 91 |
 | Error handling | Edge | 55 | 82 | 89 |
 | **Weighted Average** | | **58** | **84** | **92** |
-
-**Recommendation:** sonnet (meets 75+ threshold at lower cost than opus)
 ```
+
+### README Documentation
+
+After evaluation, add results to the skill's README for historical tracking:
+
+```markdown
+## Evaluation Results
+
+| Date | Scenario | Difficulty | Model | Score | Rating |
+|------|----------|------------|-------|-------|--------|
+| 2025-01-15 | Standard workflow | Hard | claude-haiku-4-5-20250101 | 62 | ⚠️ Partial |
+| 2025-01-15 | Standard workflow | Hard | claude-sonnet-4-5-20250929 | 88 | ✅ Good |
+| 2025-01-15 | Standard workflow | Hard | claude-opus-4-5-20251101 | 94 | ✅ Excellent |
+| 2025-01-20 | Complex judgment | Hard | claude-haiku-4-5-20250101 | 41 | ⚠️ Marginal |
+| 2025-01-20 | Complex judgment | Hard | claude-sonnet-4-5-20250929 | 75 | ✅ Good |
+| 2025-01-20 | Complex judgment | Hard | claude-opus-4-5-20251101 | 91 | ✅ Excellent |
+```
+
+**Table requirements:**
+- Use full model IDs (e.g., `claude-sonnet-4-5-20250929`)
+- Include evaluation date in YYYY-MM-DD format
+- Show scenario difficulty level
+- Append new evaluations (maintain history)
+- Include both numeric score and rating
