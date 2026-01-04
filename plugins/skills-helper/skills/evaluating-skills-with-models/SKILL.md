@@ -4,7 +4,7 @@ description: Evaluate skills by executing them across sonnet, opus, and haiku mo
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Evaluating Skills with Models
@@ -22,6 +22,8 @@ Binary pass/fail ("did it do X?") fails to differentiate models - all models can
 ### Step 1: Load Test Scenarios
 
 Check for `tests/scenarios.md` in the target skill directory.
+
+**Default to difficult scenarios:** When multiple scenarios exist, prioritize **Hard** or **Medium** difficulty scenarios for evaluation. Easy scenarios often don't show meaningful differences between models and aren't realistic for production use.
 
 **Required scenario format:**
 
@@ -115,32 +117,30 @@ Total = Σ(behavior_score × weight) / Σ(weights)
 | 25-49 | ⚠️ Marginal | Significant problems |
 | 0-24 | ❌ Fail | Does not work |
 
-### Step 5: Determine Recommended Model
+### Step 5: Add Results to README
 
-**5a. Quality threshold check:**
-Select models with score ≥ 75.
+After evaluation, add a table to the skill's README documenting the results:
 
-**5b. Calculate total cost efficiency:**
+**README section format:**
 
-Token pricing (per MTok) from [Claude Pricing](https://platform.claude.com/docs/en/about-claude/pricing):
+```markdown
+## Evaluation Results
 
-| Model | Input | Output | Cost Ratio (vs Haiku) |
-|-------|-------|--------|----------------------|
-| Haiku 4.5 | $1 | $5 | 1x |
-| Sonnet 4.5 | $3 | $15 | 3x |
-| Opus 4.5 | $5 | $25 | 5x |
-
-```
-Execution Cost = tokens × cost_ratio
-Iteration Multiplier = 1 + (90 - quality_score) / 100
-  # Score 90 → 1.0x, Score 75 → 1.15x, Score 50 → 1.4x
-Total Cost = Execution Cost × Iteration Multiplier
+| Date | Scenario | Difficulty | Model | Score | Rating |
+|------|----------|------------|-------|-------|--------|
+| 2025-01-15 | Standard workflow | Hard | claude-haiku-4-5-20250101 | 42 | ⚠️ Marginal |
+| 2025-01-15 | Standard workflow | Hard | claude-sonnet-4-5-20250929 | 85 | ✅ Good |
+| 2025-01-15 | Standard workflow | Hard | claude-opus-4-5-20251101 | 100 | ✅ Excellent |
 ```
 
-**5c. Recommend based on Total Cost:**
-Among models with score ≥ 75, recommend the one with **lowest Total Cost**.
+**Table requirements:**
+- Include full model IDs (e.g., `claude-sonnet-4-5-20250929`) not just short names
+- Show evaluation date in YYYY-MM-DD format
+- Indicate scenario difficulty level (Easy/Medium/Hard/Edge-case)
+- Include both numeric score and rating emoji
+- Append new evaluations (don't overwrite previous results)
 
-Note: If Total Costs are within 20% of each other, prefer the higher-quality model.
+This creates a historical record of how the skill performs across models and improvements over time.
 
 ### Step 6: Output Summary
 
@@ -149,11 +149,12 @@ Note: If Total Costs are within 20% of each other, prefer the higher-quality mod
 
 **Skill:** {skill_path}
 **Scenario:** {scenario_name} ({difficulty})
+**Date:** {YYYY-MM-DD}
 
 ### Scores by Behavior
 
-| Behavior | Weight | Haiku | Sonnet | Opus |
-|----------|--------|-------|--------|------|
+| Behavior | Weight | claude-haiku-4-5-20250101 | claude-sonnet-4-5-20250929 | claude-opus-4-5-20251101 |
+|----------|--------|---------------------------|----------------------------|--------------------------|
 | Asks clarifying questions | 4 | 25 | 75 | 100 |
 | Determines freedom level | 3 | 50 | 75 | 100 |
 | Creates proper SKILL.md | 5 | 50 | 100 | 100 |
@@ -162,24 +163,18 @@ Note: If Total Costs are within 20% of each other, prefer the higher-quality mod
 
 | Model | Score | Rating |
 |-------|-------|--------|
-| haiku | 42 | ⚠️ Marginal |
-| sonnet | 85 | ✅ Good |
-| opus | 100 | ✅ Excellent |
-
-### Cost Analysis
-
-| Model | Tokens | Tool Uses | Exec Cost | Iter. Multi | Total Cost |
-|-------|--------|-----------|-----------|-------------|------------|
-| haiku | 35k | 17 | 35k | 1.48x | 52k |
-| sonnet | 57k | 21 | 171k | 1.05x | 180k |
-| opus | 38k | 9 | 190k | 1.00x | 190k |
-
-**Recommended model:** sonnet (lowest total cost among score ≥ 75)
+| claude-haiku-4-5-20250101 | 42 | ⚠️ Marginal |
+| claude-sonnet-4-5-20250929 | 85 | ✅ Good |
+| claude-opus-4-5-20251101 | 100 | ✅ Excellent |
 
 ### Observations
 - Haiku: Skipped justification for freedom level (pitfall)
 - Haiku: Asked only 1 generic question vs 3 specific
 - Sonnet: Met all quality criteria except verbose output
+
+### Next Steps
+- Add these results to the skill's README (see Step 5)
+- Consider model selection based on your quality requirements and budget
 ```
 
 ## Common Pitfalls by Model
@@ -198,7 +193,7 @@ Note: If Total Costs are within 20% of each other, prefer the higher-quality mod
 ## Quick Reference
 
 ```
-Load scenarios → Execute (parallel) → Score behaviors → Calculate totals → Cost analysis → Recommend model
+Load scenarios (prioritize Hard) → Execute (parallel) → Score behaviors → Calculate totals → Add to README → Output summary
 ```
 
 For detailed scoring guidelines, see [references/evaluation-structure.md](references/evaluation-structure.md).
