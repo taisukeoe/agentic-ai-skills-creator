@@ -4,7 +4,7 @@ description: Evaluate skills by executing them across sonnet, opus, and haiku mo
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Evaluating Skills with Models
