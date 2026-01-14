@@ -4,7 +4,7 @@ description: Creating high-quality agent skills following Claude's official best
 license: Apache-2.0
 metadata:
   author: Softgraphy GK
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Creating Effective Skills
@@ -96,7 +96,7 @@ skill-name/
 ├── README.md (optional - human-facing installation and usage guide)
 ├── references/ (optional)
 ├── tests/
-│   └── scenarios.md (required - self-evaluation scenarios)
+│   └── scenarios.md (optional - self-evaluation scenarios)
 ├── scripts/ (optional)
 └── assets/ (optional)
 ```
@@ -169,9 +169,11 @@ skill/
 
 Avoid: deeply nested references, duplicate information, generic file names.
 
-### Step 8: Create Test Scenarios
+### Step 8: Create Test Scenarios (Optional)
 
-Create `tests/scenarios.md` for self-evaluation with `/evaluating-skills-with-models`:
+**Ask the user**: "Would you like to create test scenarios for this skill? Test scenarios enable automated evaluation with `/evaluating-skills-with-models` to measure skill quality across different models (sonnet, opus, haiku)."
+
+If the user agrees, create `tests/scenarios.md` for self-evaluation:
 
 ```markdown
 ## Scenario: [Name]
