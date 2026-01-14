@@ -45,14 +45,15 @@
    - **Haiku pitfall:** Too short ("Formats tables") or missing "when to use"
    - **Weight:** 5
 
-5. Creates tests/scenarios.md
-   - **Minimum:** File exists with at least 1 scenario
+5. Asks about test scenarios (Step 8 is optional)
+   - **Minimum:** Mentions or asks about test scenarios
    - **Quality criteria:**
-     - Uses new format with Difficulty, Quality criteria, Weights
-     - Includes at least Easy + Medium scenarios
-     - Expected behaviors are specific, not vague
-   - **Haiku pitfall:** Uses old binary format without quality criteria
-   - **Weight:** 4
+     - Explicitly asks: "Would you like to create test scenarios for this skill?"
+     - Explains benefit: automated evaluation with /evaluating-skills-with-models
+     - If user agrees, creates tests/scenarios.md with new format (Difficulty, Quality criteria, Weights)
+     - If user declines, proceeds without tests/scenarios.md
+   - **Haiku pitfall:** Creates tests/scenarios.md without asking, or skips Step 8 entirely
+   - **Weight:** 3
 
 **Output validation:**
 - Filename pattern: `*-tables/SKILL.md` or `*-markdown*/SKILL.md`
@@ -147,8 +148,8 @@
      - Creates proper directory structure
      - SKILL.md follows all conventions
      - Creates reference files for detailed content
-     - Creates tests/scenarios.md with new format
-   - **Haiku pitfall:** Incomplete structure, missing tests, old scenario format
+     - Asks about test scenarios (Step 8) and creates if user agrees
+   - **Haiku pitfall:** Incomplete structure, creates tests without asking, or skips Step 8 entirely
    - **Weight:** 5
 
 ---
