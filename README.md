@@ -40,7 +40,19 @@ Experimental skills for skill development.
 
 ## Installation
 
-### From GitHub (Recommended)
+### Via skills.sh
+
+Works with Claude Code, Cursor, Cline, GitHub Copilot, and other AI agents.
+
+```bash
+# Install all skills
+npx skills add taisukeoe/agentic-ai-skills-creator
+
+# Install specific skill only
+npx skills add taisukeoe/agentic-ai-skills-creator --skill creating-effective-skills
+```
+
+### Via Claude Code Plugin Marketplace
 
 ```bash
 /plugin marketplace add taisukeoe/agentic-ai-skills-creator
@@ -98,4 +110,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ## Links
 
+- [skills.sh](https://skills.sh/) - Agent Skills Directory
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
